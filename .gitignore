@@ -1,0 +1,45 @@
+# ROOT / STAR binary outputs
+*.root
+*.fzd
+*.daq
+*.MuDst.root
+*.picoDst.root
+*.geant.root
+*.geom.root
+*.hist.root
+*.runco.root
+*.event.root
+*.McEvent.root
+*.minimc.root
+*.tags.root
+
+# ROOT / CINT / ACLiC generated files
+AutoDict*
+*_C.so
+*_C.d
+*_C_ACLiC_dict.*
+*.so
+*.d
+*.pcm
+
+# Logs and temporary files
+*.log
+paw.metafile
+*.out
+*.err
+core
+core.*
+
+# Local compiled executables
+Pythia/make_d0_pythia8
+Pythia/make_d0_pythia8_8317
+make_d0_pythia8
+make_d0_pythia8_8317
+
+# Editor / OS clutter
+*~
+*.swp
+.DS_Store
+
+# Keep empty folders if needed
+!.gitkeep
