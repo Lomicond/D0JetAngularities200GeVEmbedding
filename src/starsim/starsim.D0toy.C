@@ -112,7 +112,7 @@ void geometry( TString tag, Bool_t agml=true )
   //  if ( agml ) command("gexec $STAR_LIB/libxgeometry.so");
 }
 //-----------------------------------------------------------------------------
-void OpenPythiaTree(const char *fname = "Pythia/pythia8_D0_DetroitTune.root")
+void OpenPythiaTree(const char *fname)
 {
     TDirectory *savedDir = gDirectory;   // důležité
 
@@ -321,11 +321,8 @@ void SetupD0Decay()
 void trig(Int_t n=1)
 {
     if (!gPythiaTree) {
-        OpenPythiaTree("./Pythia/pythia8_D0_DetroitTune.root");
-    }
-
-    if (!gPythiaTree) {
-        cout << "No PYTHIA tree available. Stop." << endl;
+        cout << "No PYTHIA tree available. "
+             << "Open it before calling trig()." << endl;
         return;
     }
 
@@ -477,8 +474,24 @@ void Kinematics()
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
-void starsim( Int_t nevents=1, Int_t rngSeed=1234 )
-{ 
+void starsim(Int_t nevents = 1,
+             const char *pythiaInput = "Pythia/pythia8_D0_DetroitTune.root",
+             const char *starsimRootOutput = "D0toy.starsim.root",
+             const char *fzdOutput = "D0toy.starsim.fzd",
+             Double_t magneticField = -5.005)
+{
+    if (nevents <= 0) {
+        cout << "ERROR: nevents must be > 0" << endl;
+        return;
+    }
+
+    cout << "STARSIM configuration:" << endl
+         << "  events          = " << nevents << endl
+         << "  PYTHIA input    = " << pythiaInput << endl
+         << "  ROOT output     = " << starsimRootOutput << endl
+         << "  FZD output      = " << fzdOutput << endl
+         << "  magnetic field  = " << magneticField << endl;
+
     gROOT->ProcessLine(".L bfc.C");
     {
         TString simple = "y2014a geant gstar usexgeom agml ";
@@ -496,20 +509,22 @@ gSystem->Load("xgeometry.so");
 
 gSystem->Load("StarGeneratorDecay.so");
 gSystem->Load("Pythia8_3_03.so");
-geometry("field=-5.005 y2014a");
+TString geometryCommand;
+geometryCommand.Form("field=%g y2014a", magneticField);
+geometry(geometryCommand);
     // Do not load these manually for now:
     // gSystem->Load("libStarGeneratorUtil.so");
     // gSystem->Load("libStarGeneratorEvent.so");
     // gSystem->Load("libStarGeneratorBase.so");
 
-    // Do not set RNG manually for now:
-    // StarRandom::seed(rngSeed);
-    // StarRandom::capture();
+    // Keep the current random-number treatment unchanged in Stage 2A.
+    // A STARSIM/GEANT seed will be handled separately once the official
+    // embedding convention is fixed.
 
     _primary = new StarPrimaryMaker();
     //_primary->SetRunNumber(15130045);
 
-    _primary->SetFileName("D0toy.starsim.root");
+    _primary->SetFileName(starsimRootOutput);
     chain->AddBefore("geant", _primary);
 
     Kinematics();
@@ -520,12 +535,39 @@ geometry("field=-5.005 y2014a");
 
     _primary->Init();
 
+    OpenPythiaTree(pythiaInput);
+    if (!gPythiaTree) {
+        cout << "ERROR: PYTHIA input initialization failed." << endl;
+        return;
+    }
+
+    if (nevents > gPythiaEntries) {
+        cout << "WARNING: requested " << nevents
+             << " STARSIM events, but PYTHIA tree contains only "
+             << gPythiaEntries << ". Processing available entries only."
+             << endl;
+    }
+
     command("gkine -4 0");
-    command("gfile o D0toy.starsim.fzd");
+
+    TString fzdCommand = "gfile o ";
+    fzdCommand += fzdOutput;
+    command(fzdCommand);
 
     trig(nevents);
 
     command("call agexit");
+
+    if (gPythiaFile) {
+        gPythiaFile->Close();
+        delete gPythiaFile;
+        gPythiaFile = 0;
+        gPythiaTree = 0;
+    }
+
+    cout << "STARSIM finished." << endl
+         << "  ROOT output = " << starsimRootOutput << endl
+         << "  FZD output  = " << fzdOutput << endl;
 }
 // ----------------------------------------------------------------------------
 
