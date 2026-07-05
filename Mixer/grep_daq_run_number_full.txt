@@ -1,0 +1,4 @@
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.cxx:23:  mDaqRunNumber(0),
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:115:  void SetDaqRunNumber( Int_t run ){ mDaqRunNumber= run; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:117:  Int_t GetDaqRunNumber(){ return mDaqRunNumber; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:235:  Int_t    mDaqRunNumber;          ///< DAQ run number (for embedding)

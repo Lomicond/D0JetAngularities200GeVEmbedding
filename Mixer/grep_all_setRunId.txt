@@ -1,0 +1,35 @@
+/star/nfs4/AFS/star/packages/pro/StRoot/StEEmcPool/StBlankStEventMaker/StBlankStEventMaker.cxx:50:  runInfo->setRunId(run);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEmcPool/StPhotonCommon/MyEvent.h:102:  void setRunId(int val) {fRunId=val;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1227:StEvent::setRunId(int val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1231:    info->setRunId(val);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:364:    void setRunId(int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:76:StEventInfo::setRunId(int val) { mRunId = val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:58:    void setRunId(int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:173:StRunInfo::setRunId(int val) {mRunId = val;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:86:    void     setRunId(int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3614:    \verb+void setRunId(int);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3715:    \verb+void setRunId(int);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5909:    \verb+void setRunId(int);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEventMaker/StEventMaker.cxx:201:    evinfo->setRunId(GetRunNumber());
+/star/nfs4/AFS/star/packages/pro/StRoot/StEventMaker/StEventMaker.cxx:527:    mCurrentRunInfo->setRunId(mCurrentEvent->runId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StFilterMaker/StGammaFilterMaker.cxx:429:                mPythiaEvent->setRunId(eventTable->n_run);
+/star/nfs4/AFS/star/packages/pro/StRoot/StJetMaker/StJetSkimEventMaker.cxx:212:	mEvent->setRunId( muEvent->runId() );
+/star/nfs4/AFS/star/packages/pro/StRoot/StMiniMcEvent/StMiniMcEvent.h:85:  void setRunId(Int_t val)				{ mRunId=val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StMiniMcMaker/StMiniMcMaker.cxx:1170:  mMiniMcEvent->setRunId((Int_t) mRcEvent->runId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:32:      pRunInfo->setRunId( eventInfo->runId() );
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroUtil.cxx:484:  mStEvent->setRunId(mMicroEvent->getRunID());
+/star/nfs4/AFS/star/packages/pro/StRoot/StPicoDstMaker/StPicoDstMaker.cxx:1779:  picoEvent->setRunId( ev->runNumber() );
+/star/nfs4/AFS/star/packages/pro/StRoot/StPicoEvent/StPicoEvent.h:249:  void setRunId(Int_t id)                     { mRunId = id; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StBfcTriggerFilterMaker/StPythiaEventMaker.cxx:71: 	mPythiaEvent->setRunId(eventTable->n_run);
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StBfcTriggerFilterMaker/StPythiaEventMaker.cxx:77://  mPythiaEvent->setRunId(GetRunNumber());
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StChargedPionAnalysisMaker/StChargedPionBaseEv.h:63:    virtual void setRunId(unsigned int)                                 = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StChargedPionAnalysisMaker/StChargedPionEvent.h:76:    void setRunId(unsigned int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StChargedPionAnalysisMaker/StChargedPionEvent.h:183:inline void StChargedPionEvent::setRunId(unsigned int a) { mRunId = a; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StChargedPionAnalysisMaker/StChargedPionHelpers.cxx:29:    ev->setRunId(skimEvent->runId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StChargedPionAnalysisMaker/StChargedPionHelpers.cxx:290:    ev->setRunId( StMuDst::event()->runNumber() );
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StChargedPionAnalysisMaker/StChargedPionMcEvent.h:144:    void setRunId(unsigned int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StChargedPionAnalysisMaker/StChargedPionMcEvent.h:328:StChargedPionMcEvent::setRunId(unsigned int a) { mRunId = a; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StJetSkimEvent/StJetSkimEvent.h:256:  void setRunId(int i) {mRunId = i;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StJetSkimEvent/StPythiaEvent.h:125:  void setRunId(int id);
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StJetSkimEvent/StPythiaEvent.h:247:inline void StPythiaEvent::setRunId(int id) { mRunId = id; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StSpinPool/StMCAsymMaker/StMCAsymMaker.cxx:579:    pythia->setRunId(eventTable->n_run);

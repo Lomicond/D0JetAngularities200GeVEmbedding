@@ -1,0 +1,423 @@
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/GenerateVertex.C:107:      if (chain->GetEvtHddr()->IsNewRun()) {
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/GenerateVertex.C:108:         printf("run number = %d\n", chain->GetRunNumber());
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_FullPythia.C:24:class StEvtHddr;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_FullPythia.C:82:  if (geantMk) geantMk->SetMode(1);   // Mixer mode - do not modify EvtHddr
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_Jet.C:401:		printf("QAInfo: Done with Event [no. %d/run %d/evt. %d/Date.Time %d.%d/sta %d] Real Time = %10.2f seconds Cpu Time = %10.2f seconds\n",iEvent,Chain->GetRunNumber(),Chain->GetEventNumber(),Chain->GetDate(),Chain->GetTime(),chain3->GetMakeReturn(),evnt.GetRealTime("QAInfo:"),evnt.GetCpuTime("QAInfo:"));
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4.C:25:class StEvtHddr;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4.C:79:  if (geantMk) geantMk->SetMode(1);   // Mixer mode - do not modify EvtHddr
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4.C:212:   StEvtHddr *fEvtHddr = (StEvtHddr*)chain->GetDataSet("EvtHddr");
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4.C:213:   StEvtHddr *fEvtHddrDaq = (StEvtHddr*)chain1->GetDataSet("EvtHddr");
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4.C:214:   *fEvtHddr = *fEvtHddrDaq;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4.C:218:   printf ("QAInfo: Done with Event [no. %d/run %d/evt. %d/Date.Time%d.%d/sta %d] Real Time = %10.2f seconds Cpu Time =  %10.2f seconds \n", i,chain->GetRunNumber(),chain->GetEventNumber(),chain->GetDate(), chain->GetTime(),
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_noFTPC.C:24:class StEvtHddr;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_noFTPC.C:83:  if (geantMk) geantMk->SetMode(1);   // Mixer mode - do not modify EvtHddr
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_noFTPC.C:229:   StEvtHddr *fEvtHddr = (StEvtHddr*)chain->GetDataSet("EvtHddr");
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_noFTPC.C:230:   StEvtHddr *fEvtHddrDaq = (StEvtHddr*)chain1->GetDataSet("EvtHddr");
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_noFTPC.C:231:   *fEvtHddr = *fEvtHddrDaq;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_noFTPC.C:235:   printf ("QAInfo: Done with Event [no. %d/run %d/evt. %d/Date.Time%d.%d/sta %d] Real Time = %10.2f seconds Cpu Time =  %10.2f seconds \n", i,chain->GetRunNumber(),chain->GetEventNumber(),chain->GetDate(), chain->GetTime(),
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_svt.C:25:class StEvtHddr;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_svt.C:79:  if (geantMk) geantMk->SetMode(1);   // Mixer mode - do not modify EvtHddr
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_svt.C:212:   StEvtHddr *fEvtHddr = (StEvtHddr*)chain->GetDataSet("EvtHddr");
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_svt.C:213:   StEvtHddr *fEvtHddrDaq = (StEvtHddr*)chain1->GetDataSet("EvtHddr");
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_svt.C:214:   *fEvtHddr = *fEvtHddrDaq;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v4_svt.C:218:   printf ("QAInfo: Done with Event [no. %d/run %d/evt. %d/Date.Time%d.%d/sta %d] Real Time = %10.2f seconds Cpu Time =  %10.2f seconds \n", i,chain->GetRunNumber(),chain->GetEventNumber(),chain->GetDate(), chain->GetTime(),
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v5.C:33:class StEvtHddr;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/bfcMixer_v5.C:91:  if (geantMk) geantMk->SetMode(1);   // Mixer mode - do not modify EvtHddr
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:10:uniqueRunNumber=$(ls $daqDir | cut -d"_" -f4 | sort | uniq)
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:11:nRunNumbers=$(ls $daqDir | cut -d"_" -f4 | sort | uniq | wc -l)
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:13:echo "Number of Unique Runs: " $nRunNumbers
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:17:for i in `seq 1 $nRunNumbers`;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:20:    runNumber=$(echo $uniqueRunNumber | awk -vv=$i '{ print $v }')
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:21:    nfile=$(ls $daqDir/*$runNumber* | wc -l)
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:22:    nsize=$(du -cm $daqDir/*$runNumber* | grep total | awk '{print $1}')
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:25:	 newFileName=$outDir/"${filetype}_"$runNumber"_raw_0000000.daq"
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:27:	 echo $runNumber $nfile $nsize $newFileName
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:29:	 echo $runNumber >> combined_runs.list
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:31:	 cat $daqDir/*$runNumber*.daq > $newFileName
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:33:	 for j in $(ls $daqDir/*$runNumber*.daq)
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/daqAdder.sh:36:	    echo $runNumber $nfile $nsize $outDir/$bn
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:3:#Hadds all tag files of a given runNumber
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:12:uniqueRunNumber=$(ls $tagDir | cut -d"_" -f4 | sort | uniq)
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:13:nRunNumbers=$(ls $tagDir | cut -d"_" -f4 | sort | uniq | wc -l)
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:15:echo "Number of Unique Runs:" $nRunNumbers
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:17:for i in `seq 1 $nRunNumbers`;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:20:    runNumber=$(echo $uniqueRunNumber | awk -vv=$i '{ print $v }')
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:21:    echo $runNumber
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:23:    combrun=`grep $runNumber combined_runs.list`
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:26:	 cp -p $tagDir/*$runNumber*.${tagtype}.root $outDir/
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:28:	 newFileName=$outDir/"${filetype}_"$runNumber"_raw_0000000.${tagtype}.root"
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/daqtags/tagAdder.sh:31:	 hadd $newFileName $tagDir/*$runNumber*.${tagtype}.root
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/moretags/README:6:outputs the runID and eventID of those events that pass the event cuts to .chopper.txt file, 
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/moretags/makeMuDstQA.C:83:  Int_t mRunId, mEvtId;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/moretags/makeMuDstQA.C:91:  mMoreTagsTree->Branch("RunId",&mRunId,"RunId/I");
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/moretags/makeMuDstQA.C:210:     mRunId = mMuEvent->runNumber();
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/moretags/makeMuDstQA.C:214:     //cout<<mRunId<<" "<<mEvtId<<" "<<mMuEvent->eventInfo().time()<<" "<<mMuEvent->runInfo().productionTime()<<endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/moretags/makeMuDstQA.C:293:     //cout<<"Run#: "<<mMuEvent->runNumber()<<endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/moretags/makeMuDstQA.C:313:     chop_output<<mRunId<<'\t'<<mEvtId<<endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/runEmbeddingSimulation2014.C:154:    chain->SetDateTime( int(_eventtime), int( 100000*(_eventtime-int(_eventtime)) ) ); 
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/runEmbeddingSimulation2014.C:217:  _tags->SetBranchAddress( "RunId",       &_runnumber );
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/runEmbeddingSimulation2016.C:154:    chain->SetDateTime( int(_eventtime), int( 100000*(_eventtime-int(_eventtime)) ) ); 
+/star/nfs4/AFS/star/packages/pro/StRoot/macros/embedding/runEmbeddingSimulation2016.C:217:  _tags->SetBranchAddress( "RunId",       &_runnumber );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/BASE/StarPrimaryMaker.cxx:53:  mRunNumber(0),
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/BASE/StarPrimaryMaker.cxx:335:  mPrimaryEvent->SetRunNumber(runnumber);
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/BASE/StarPrimaryMaker.cxx:336:  mRunNumber = runnumber;
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/BASE/StarPrimaryMaker.cxx:403:  LOG_INFO << Form("[%i]Beamline Parameters run=%i vx=%6.4f vy=%6.4f vz=%6.3f dxdz=%6.4f dydz=%6.4f",mDoBeamline,mRunNumber,mVx,mVy,mVz,mVdxdz,mVdydz) << endm;
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/BASE/StarPrimaryMaker.h:221:  Int_t mRunNumber;
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EMBED/StarEmbedMaker.cxx:18:  mTree->SetBranchAddress( "EvtHddr.mRunNumber",       &mRun   );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EMBED/StarEmbedMaker.cxx:19:  mTree->SetBranchAddress( "EvtHddr.mEventNumber",     &mEvent );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.cxx:22:  mRunNumber(0),
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.cxx:23:  mDaqRunNumber(0),
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.cxx:106:      cout << "Run number:   " << mRunNumber << endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:111:  void SetRunNumber( Int_t run ){ mRunNumber = run; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:113:  Int_t GetRunNumber(){ return mRunNumber; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:115:  void SetDaqRunNumber( Int_t run ){ mDaqRunNumber= run; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:117:  Int_t GetDaqRunNumber(){ return mDaqRunNumber; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:234:  Int_t    mRunNumber;             ///< Monte Carlo run number
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/EVENT/StarGenEvent.h:235:  Int_t    mDaqRunNumber;          ///< DAQ run number (for embedding)
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/macros/production/simulation.y2014x.pythia8.HFjets.C:43:int    _runId   = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/macros/production/simulation.y2014x.pythia8.HFjets.C:45:void trig( int runId, int eventId, double vz )
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/macros/starsim.reader.standalone.C:68:  std::cout << "RUN NUMBER    = " << event->GetRunNumber() << std::endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:109:    void seed_uniquestream( rng_state_t* Xin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:121:    mixmax_engine(myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID );	   // Constructor with four 32-bit seeds
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:136:    myuint apply_bigskip(myuint* Vout, myuint* Vin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:184:PREF mixmax_engine POST ::mixmax_engine(myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID)
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:187:    seed_uniquestream( &S, clusterID,  machineID,  runID,  streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:275:PREF void mixmax_engine POST ::seed_uniquestream( rng_state_t* Xin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID ){
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:278:    Xin->sumtot = apply_bigskip(Xin->V.data(), Xin->V.data(),  clusterID,  machineID,  runID,   streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:281:    // std::cerr << "seeding with: " << clusterID << ", " << machineID << ", " <<   runID <<  ", " <<  streamID << "\n";
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:283:              << clusterID << ", " << machineID << ", " <<   runID <<  ", " <<  streamID << "\n";
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:288:PREF myuint mixmax_engine POST ::apply_bigskip( myuint* Vout, myuint* Vin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID ){
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:300:     and use it in all your runs, just change runID to get completely nonoverlapping streams of random numbers on a different day.
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_2_35/include/Pythia8Plugins/MixMax.h:619:    myID_t IDvec[4] = {streamID, runID, machineID, clusterID};
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:110:    void seed_uniquestream( rng_state_t* Xin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:122:    mixmax_engine(myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID );    // Constructor with four 32-bit seeds
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:137:    myuint apply_bigskip(myuint* Vout, myuint* Vin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:185:PREF mixmax_engine POST ::mixmax_engine(myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID)
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:188:    seed_uniquestream( &S, clusterID,  machineID,  runID,  streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:276:PREF void mixmax_engine POST ::seed_uniquestream( rng_state_t* Xin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID ){
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:279:    Xin->sumtot = apply_bigskip(Xin->V.data(), Xin->V.data(),  clusterID,  machineID,  runID,   streamID );
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:282:    // std::cerr << "seeding with: " << clusterID << ", " << machineID << ", " <<   runID <<  ", " <<  streamID << "\n";
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:284:              << clusterID << ", " << machineID << ", " <<   runID <<  ", " <<  streamID << "\n";
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:289:PREF myuint mixmax_engine POST ::apply_bigskip( myuint* Vout, myuint* Vin, myID_t clusterID, myID_t machineID, myID_t runID, myID_t  streamID ){
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:301:     and use it in all your runs, just change runID to get completely nonoverlapping streams of random numbers on a different day.
+/star/nfs4/AFS/star/packages/pro/StRoot/StarGenerator/Pythia8_3_03/include/Pythia8Plugins/MixMax.h:620:    myID_t IDvec[4] = {streamID, runID, machineID, clusterID};
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:118: * Added StRunInfo and access functions.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:215:#include "StEventInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:232:#include "StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:351:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:359:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:365:StEvent::runId() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:367:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:369:    return info ? info->runId() : 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:375:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:383:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:391:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:396:StEventInfo*
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:399:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:404:const StEventInfo*
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:407:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:412:StRunInfo*
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:415:    StRunInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:420:const StRunInfo*
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:423:    StRunInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1221:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1227:StEvent::setRunId(int val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1229:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1231:    info->setRunId(val);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1237:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1245:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1253:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1261:    StEventInfo* info = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1267:StEvent::setInfo(StEventInfo* val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1273:StEvent::setRunInfo(StRunInfo* val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.cxx:1579:    cout << "\trunId:                       " << runId() << endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:106: * Added StRunInfo and access functions.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:189:class StEventInfo;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:218:class StRunInfo;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:241:    int                                 runId() const;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:246:    StEventInfo*                        info();
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:247:    const StEventInfo*                  info() const;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:249:    StRunInfo*                          runInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:250:    const StRunInfo*                    runInfo() const;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:364:    void setRunId(int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:369:    void setInfo(StEventInfo*);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEvent.h:370:    void setRunInfo(StRunInfo*);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventClusteringHints.cxx:125: * Added StRunInfo.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventClusteringHints.cxx:158:    setBranch("StRunInfo",                   "evt_header",   2);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventClusteringHints.cxx:159:    setBranch("StEventInfo",                 "evt_header",   2);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventClusteringHints.cxx:218:    setBranch("StRunInfo",                   "event", 1);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventClusteringHints.cxx:219:    setBranch("StEventInfo",                 "event", 1);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:3: * $Id: StEventInfo.cxx,v 2.5 2009/11/23 16:34:06 fisyak Exp $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:12: * $Log: StEventInfo.cxx,v $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:29:#include "StEventInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:32:static const char rcsid[] = "$Id: StEventInfo.cxx,v 2.5 2009/11/23 16:34:06 fisyak Exp $";
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:34:ClassImp(StEventInfo)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:36:StEventInfo::StEventInfo()
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:38:    mRunId = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:46:StEventInfo::~StEventInfo() { /* noop */ }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:49:StEventInfo::type() const { return mType; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:52:StEventInfo::id() const { return mId; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:55:StEventInfo::runId() const { return mRunId; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:58:StEventInfo::time() const { return mTime; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:61:StEventInfo::triggerMask() const { return mTriggerMask; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:64:StEventInfo::bunchCrossingNumber(unsigned int i) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:70:StEventInfo::eventSize() const { return mEventSize; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:73:StEventInfo::setType(const char* val) { mType = val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:76:StEventInfo::setRunId(int val) { mRunId = val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:79:StEventInfo::setId(int val) { mId = val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:82:StEventInfo::setTime(int val) { mTime = val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:85:StEventInfo::setTriggerMask(unsigned int val) { mTriggerMask = val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:88:StEventInfo::setBunchCrossingNumber(unsigned int val, unsigned int i)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.cxx:94:StEventInfo::setEventSize(unsigned int val) { mEventSize = val; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:2: * \class StEventInfo 
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:7: * $Id: StEventInfo.h,v 2.6 2009/11/23 16:34:06 fisyak Exp $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:16: * $Log: StEventInfo.h,v $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:37:#ifndef StEventInfo_hh
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:38:#define StEventInfo_hh
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:44:class StEventInfo : public StObject {
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:46:    StEventInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:47:    virtual ~StEventInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:51:    int            runId() const;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:58:    void setRunId(int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:67:    Int_t    mRunId;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventInfo.h:74:    ClassDef(StEventInfo,2)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventTypes.h:124: * Added StRunInfo.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventTypes.h:189:#include "StEventInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StEventTypes.h:270:#include "StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:14: * Removed 'else if (runNumber < 7000000)'. Originally John Nelson
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:252:StL0Trigger::bunchCrossingId7bit(int runNumber) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:263:    if (runNumber>4000000)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:272:    if(runNumber<3010000) { ibits=7; }  /* before run 3010* this should be 7 */
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:298:StL0Trigger::spinBits(int runNumber) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:301:    if (runNumber<4000000){
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:320:StL0Trigger::spinBitYellowUp(int runNumber) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:322:    if (runNumber<4000000){
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:332:StL0Trigger::spinBitYellowDown(int runNumber) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:334:    if (runNumber<4000000){
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:344:StL0Trigger::spinBitBlueUp(int runNumber) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:346:    if (runNumber<4000000){
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:356:StL0Trigger::spinBitBlueDown(int runNumber) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StL0Trigger.cxx:358:    if (runNumber<4000000){
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.cxx:33:  mRHICfRunNumber = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.cxx:55:void StRHICfCollection::setRHICfRunNumber(UInt_t run){mRHICfRunNumber = run;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.cxx:58:void StRHICfCollection::setRunType(UInt_t type){mRunType = type;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.cxx:60:void StRHICfCollection::setRunTime(Int_t idx, UInt_t time){mRunTime[idx] = time;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.cxx:61:void StRHICfCollection::setRunTRGM(UInt_t trgm){mRunTRGM = trgm;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.cxx:65:UInt_t StRHICfCollection::getRHICfRunNumber() const { return mRHICfRunNumber; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.h:34:    void setRHICfRunNumber(UInt_t run);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.h:37:    void setRunType(UInt_t type);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.h:39:    void setRunTime(Int_t idx, UInt_t time);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.h:40:    void setRunTRGM(UInt_t trgm);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.h:43:    UInt_t getRHICfRunNumber() const;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRHICfCollection.h:58:    UInt_t mRHICfRunNumber;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:3: * $Id: StRunInfo.cxx,v 2.7 2004/10/20 16:06:53 ullrich Exp $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:12: * $Log: StRunInfo.cxx,v $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:35:#include "StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:37:static const char rcsid[] = "$Id: StRunInfo.cxx,v 2.7 2004/10/20 16:06:53 ullrich Exp $";
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:39:ClassImp(StRunInfo)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:41:StRunInfo::StRunInfo()
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:43:    mRunId = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:74:StRunInfo::~StRunInfo() {/* noop */}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:77:StRunInfo::runId() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:78:{return mRunId;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:81:StRunInfo::productionTime() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:85:StRunInfo::productionVersion() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:89:StRunInfo::centerOfMassEnergy() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:93:StRunInfo::beamMassNumber(StBeamDirection dir) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:97:StRunInfo::beamEnergy(StBeamDirection dir) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:101:StRunInfo::initialBeamIntensity(StBeamDirection dir) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:105:StRunInfo::beamLifeTime(StBeamDirection dir) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:109:StRunInfo::beamFillNumber(StBeamDirection dir) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:113:StRunInfo::magneticField() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:117:StRunInfo::tpcDriftVelocity(StBeamDirection dir) const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:121:StRunInfo::svtDriftVelocityScaler() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:125:StRunInfo::zdcWestRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:129:StRunInfo::zdcEastRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:133:StRunInfo::zdcCoincidenceRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:137:StRunInfo::bbcCoincidenceRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:141:StRunInfo::backgroundRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:145:StRunInfo::l0RateToRich() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:149:StRunInfo::bbcEastRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:153:StRunInfo::bbcWestRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:157:StRunInfo::bbcBlueBackgroundRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:161:StRunInfo::bbcYellowBackgroundRate() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:165:StRunInfo::spaceChargeCorrectionMode() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:169:StRunInfo::spaceCharge() const
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:173:StRunInfo::setRunId(int val) {mRunId = val;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:176:StRunInfo::setProductionTime(time_t val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:180:StRunInfo::setProductionVersion(const char* val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:184:StRunInfo::setCenterOfMassEnergy(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:188:StRunInfo::setBeamMassNumber(StBeamDirection dir, int val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:192:StRunInfo::setBeamEnergy(StBeamDirection dir, float val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:196:StRunInfo::setInitialBeamIntensity(StBeamDirection dir, float val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:200:StRunInfo::setBeamLifeTime(StBeamDirection dir, float val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:204:StRunInfo::setBeamFillNumber(StBeamDirection dir, float val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:208:StRunInfo::setMagneticField(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:212:StRunInfo::setTpcDriftVelocity(StBeamDirection dir, double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:216:StRunInfo::setSvtDriftVelocityScaler(float val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:220:StRunInfo::setZdcWestRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:224:StRunInfo::setZdcEastRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:228:StRunInfo::setZdcCoincidenceRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:232:StRunInfo::setBbcCoincidenceRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:236:StRunInfo::setBackgroundRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:240:StRunInfo::setL0RateToRich(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:244:StRunInfo::setBbcEastRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:248:StRunInfo::setBbcWestRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:252:StRunInfo::setBbcBlueBackgroundRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:256:StRunInfo::setBbcYellowBackgroundRate(double val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:260:StRunInfo::setSpaceChargeCorrectionMode(int val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.cxx:264:StRunInfo::setSpaceCharge(float val)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:2: * \class StRunInfo 
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:7: * $Id: StRunInfo.h,v 2.8 2004/10/20 16:06:53 ullrich Exp $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:16: * $Log: StRunInfo.h,v $
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:43:#ifndef StRunInfo_hh
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:44:#define StRunInfo_hh
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:51:class StRunInfo : public StObject {
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:53:    StRunInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:54:    // StRunInfo(const StRunInfo&);            use default
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:55:    // StRunInfo& operator=(const StRunInfo&); use default
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:56:    virtual ~StRunInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:58:    int      runId() const;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:86:    void     setRunId(int);
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:116:    Int_t	mRunId;
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/StRunInfo.h:148:    ClassDef(StRunInfo,7)
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:59:% Added info on latest StRunInfo modifications.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:80:% Updated StEventInfo.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:83:% Removed StRun and StRunSummary. Added StRunInfo.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:128:% Changes to StEvent and StEventInfo.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:150:% Added StEventInfo to ref section. Updated StEvent.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3437:    \verb+int runId() const;+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3458:    \verb+StEventInfo* info();+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3459:    \verb+const StEventInfo* info() const;+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3460:    Returns a pointer to the one and only instance of \texttt{StEventInfo}.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3461:    \texttt{StEventInfo} provides no additional information but is solely
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3463:    StEvent. See also \ref{sec:StEventInfo}.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3464:    \index{StEventInfo}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3466:    \verb+StRunInfo* runInfo();+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3467:    \verb+const StRunInfo* runInfo() const;+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3468:    Returns a pointer to the one and only instance of \texttt{StRunInfo}.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3469:    \texttt{StRunInfo} contains parameters related to the current run.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3470:    See also \ref{sec:StRunInfo}.
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3471:    \index{StRunInfo}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3614:    \verb+void setRunId(int);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3626:    \verb+void setInfo(StEventInfo*);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3628:    \verb+void setRunInfo(StRunInfo*);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3680:\subsection{StEventInfo}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3681:\index{StEventInfo|textbf}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3682:\label{sec:StEventInfo}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3687:    \verb+#include "StEventInfo.h"+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3688:    \verb+class StEventInfo;+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3700:    \verb+StEventInfo();+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3701:    \verb+StEventInfo(const event_header_st&);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3705:    \verb+int runId() const;+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:3715:    \verb+void setRunId(int);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5841:\subsection{StRunInfo}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5842:\index{StRunInfo|textbf}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5843:\label{sec:StRunInfo}
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5848:    \verb+#include "StRunInfo.h"+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5849:    \verb+class StRunInfo;+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5858:    \verb+StRunInfo();+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5861:    \verb+int runId() const;+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/doc/tex/StEvent.tex:5909:    \verb+void setRunId(int);+\\
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/.consign:28:StRunInfo.h:1734568297 - 56c96f270f2e8edcd084e0085c9a1372
+/star/nfs4/AFS/star/packages/pro/StRoot/StEvent/.consign:112:StEventInfo.h:1734568297 - 861e0196d1ff5607252a6c4ead75d8d3
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:9:#include "StEvent/StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:10:#include "StEvent/StEventInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:28:    StEventInfo* eventInfo = event->info();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:31:      StRunInfo *pRunInfo = new StRunInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:32:      pRunInfo->setRunId( eventInfo->runId() );
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:45:      event->setRunInfo(pRunInfo);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:65: * StAddRunInfoMaker is a make helper maker to add the StRunInfo for the
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.h:16:   A small utility maker to add a StRunInfo for the year1 130GeV data.
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.h:17:   At that time we didn't have a StRunInfo
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.h:25:    int Make();   ///< add StRunInfo to StEvent
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.h:51: * StAddRunInfoMaker is a make helper maker to add the StRunInfo for the
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuChainMaker.cxx:444:  * StAddRunInfoMaker is a make helper maker to add the StRunInfo for the
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst.cxx:711:  ev->setInfo( new StEventInfo(mu->eventInfo()) );
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst.cxx:712:  ev->setRunInfo( new StRunInfo(mu->runInfo()) );
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst.cxx:1002:    cout << "++++++++++++++ MuDst run " << event->runId() << " event " << event->eventId() << " ++++++++++++++" << endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst2StEventMaker.cxx:45:      StEvtHddr *hd = GetEvtHddr();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst2StEventMaker.cxx:47:      if(mStEvent->runInfo()) hd->SetRunNumber(mStEvent->runInfo()->runId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst2StEventMaker.cxx:142: * GetEvtHddr() used now
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst2StEventMaker.h:18:   Also, the time is read from the StEvent and put into the StEvtHddr structute for database usage.
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDst2StEventMaker.h:27:    int Make();   ///< create a StEvent from the muDst and put it into the .data tree structure. Also time stamp gets written and set in StEvtHddr for database usage
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDstMaker.cxx:18:#include "StEvent/StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDstMaker.cxx:19:#include "StEvent/StEventInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDstMaker.cxx:2066:  StEventInfo 		&ei = me->eventInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDstMaker.cxx:2067:  StRunInfo 		&ri = me->runInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDstMaker.cxx:2068:  StEvtHddr *hd = GetEvtHddr();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDstMaker.cxx:2070:  hd->SetRunNumber(ei.runId())	;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuDstMaker.cxx:2491: * StAddRunInfoMaker is a make helper maker to add the StRunInfo for the
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.cxx:13:#include "StEvent/StEventInfo.h" 
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:17:#include "StEvent/StEventInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:18:#include "StEvent/StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:61:  int runId();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:62:  int runNumber();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:64:  StRunInfo& runInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:65:  StEventInfo& eventInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:132:  StRunInfo mRunInfo;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:133:  StEventInfo mEventInfo;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:178:inline int StMuEvent::runId() { return mEventInfo.runId();}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:179:inline int StMuEvent::runNumber() { return mEventInfo.runId();}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:180:inline StRunInfo& StMuEvent::runInfo() {return mRunInfo;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuEvent.h:181:inline StEventInfo& StMuEvent::eventInfo() {return mEventInfo;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuFmsUtil.cxx:265:  const Int_t runNumber = muDst.event()->runId();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuFmsUtil.cxx:267:  if ( triggerData && muFmsHits && runNumber < 18000000 ){ // recover for run16 AuAu data
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuIOMaker.cxx:153:  int index = mChain->GetEntryNumberWithIndex(key.GetRunId(),key.GetEventId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuIOMaker.cxx:240:  mChain->BuildIndex("MuEvent.mEventInfo.mRunId","MuEvent.mEventInfo.mId");
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuMomentumShiftMaker.cxx:16:#include "StEvent/StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.cxx:16:  mRHICfRunNumber = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.cxx:36:void StMuRHICfRawHit::setRHICfRunNumber(UInt_t run){mRHICfRunNumber = run;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.cxx:38:void StMuRHICfRawHit::setRunType(UInt_t type){mRunType = type;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.cxx:41:void StMuRHICfRawHit::setRunTime(Int_t idx, UInt_t time){mRunTime[idx] = time;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.cxx:42:void StMuRHICfRawHit::setRunTRGM(UInt_t trgm){mRunTRGM = trgm;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.cxx:57:UInt_t StMuRHICfRawHit::getRHICfRunNumber(){return mRHICfRunNumber;}
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.h:15:    void setRHICfRunNumber(UInt_t run);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.h:17:    void setRunType(UInt_t type);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.h:20:    void setRunTime(Int_t idx, UInt_t time);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.h:21:    void setRunTRGM(UInt_t trgm);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.h:31:    UInt_t getRHICfRunNumber();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfRawHit.h:51:    UInt_t mRHICfRunNumber;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:55:  muRHICfRawHit -> setRHICfRunNumber(coll->getRHICfRunNumber());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:57:  muRHICfRawHit -> setRunType(coll->getRunType());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:60:  muRHICfRawHit -> setRunTime(0, coll->getRunTime(0));
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:61:  muRHICfRawHit -> setRunTime(1, coll->getRunTime(1));
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:62:  muRHICfRawHit -> setRunTRGM(coll->getRunTRGM());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:90:  coll -> setRHICfRunNumber(muRHICfRawHit->getRHICfRunNumber());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:92:  coll -> setRunType(muRHICfRawHit->getRunType());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:95:  coll -> setRunTime(0, muRHICfRawHit->getRunTime(0));
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:96:  coll -> setRunTime(1, muRHICfRawHit->getRunTime(1));
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuRHICfUtil.cxx:97:  coll -> setRunTRGM(muRHICfRawHit->getRunTRGM());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StMuTrack.h:31:#include "StEvent/StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/macros/dumpL2info.C:18:    cout << "Run " << event->runId() << ", event " << event->eventId() << endl;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/macros/dumpL2info.C:32:    StTriggerData2005 *trgData = new StTriggerData2005(trgDataStruct,event->runId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/macros/example.C:30:  StEventInfo info;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/macros/example.C:49:  printf("EVENT id=%d, runId=%d  unix time=%d trigWord=0x%0x bXing=%d spinBits=%d nPrim=%d\n", info.id(), info.runId(), info.time(), t.triggerWord(),t.bunchCrossingId(), t.spinBits(),n);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/macros/exampleJan.C:27:      StEventInfo &info=e->eventInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/macros/exampleJan.C:28:      printf("EVENT id=%d, runId=%d  unix time=%d trigWord=0x%0x bXing=%d spinBits=%d\n", info.id(), info.runId(), info.time(), t.triggerWord(),t.bunchCrossingId(), t.spinBits());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroDstMaker.cxx:8:#include "StChain/StEvtHddr.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroDstMaker.cxx:217:          StEvtHddr *hd = (StEvtHddr*)GetDataSet("EvtHddr");
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroDstMaker.cxx:218:          if(!hd) { hd = new StEvtHddr();  AddData(hd); }
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroEvent.h:89:  void setRunID(const Int_t id)                     { mRunID = id; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroUtil.cxx:49:  processStEventInfo();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroUtil.cxx:55:void StEmcMicroUtil::processStEventInfo()
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroUtil.cxx:71:    mMicroEvent->setBunchCrossing7bit(pTrigger->bunchCrossingId7bit(mStEvent->runId()));
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroUtil.cxx:78:  mMicroEvent->setRunID((Int_t)(mStEvent->runId()));
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroUtil.cxx:484:  mStEvent->setRunId(mMicroEvent->getRunID());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EMC/examples/StEmcMicroUtil.h:47:    void             processStEventInfo();                      ///< Process StEvent general info
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/EztEventHeader.cxx:43:  mRunNumber  = 0;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/EztEventHeader.cxx:54:  fprintf(fd,"\trun number   : %-6d \n",mRunNumber);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/EztEventHeader.h:23:  unsigned mRunNumber;         //
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/EztEventHeader.h:32:  void         setRunNumber     ( unsigned rn) { mRunNumber      = rn; }
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/EztEventHeader.h:41:  unsigned     getRunNumber  ()    const { return mRunNumber;      }
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/StMuEzTree.cxx:17:#include "StEvent/StRunInfo.h"
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/StMuEzTree.cxx:46:  header->setRunNumber(ev->runId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/StTriggerDataMother.cxx:42:  int runId=-99;
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/StTriggerDataMother.cxx:45:    runId=muEve->eventInfo().runId();
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/StTriggerDataMother.cxx:54:    fCurrent = new StTriggerData2003( (const TrgDataType2003 *)blob, runId);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/StTriggerDataMother.cxx:57:    fCurrent = new StTriggerData2004( (const TrgDataType2004 *)blob, runId);
+/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/EZTREE/StTriggerDataMother.cxx:60:    fCurrent = new StTriggerData2005( (const TrgDataType2005 *)blob, runId);
+/star/nfs4/AFS/star/packages/pro/StRoot/StPicoDstMaker/StPicoDstMaker.cxx:927:  StEvtHddr* header=GetEvtHddr();
+/star/nfs4/AFS/star/packages/pro/StRoot/StPicoDstMaker/StPicoDstMaker.cxx:928:  header->SetRunNumber(event->runId());
+/star/nfs4/AFS/star/packages/pro/StRoot/StPicoDstMaker/StPicoDstMaker.cxx:1779:  picoEvent->setRunId( ev->runNumber() );
+/star/nfs4/AFS/star/packages/pro/StRoot/StPicoDstMaker/StPicoDstMaker.cxx:2150:  const int runnumber = mMuDst->event()->runNumber();

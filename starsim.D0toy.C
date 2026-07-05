@@ -496,7 +496,7 @@ gSystem->Load("xgeometry.so");
 
 gSystem->Load("StarGeneratorDecay.so");
 gSystem->Load("Pythia8_3_03.so");
-
+geometry("field=-5.005 y2014a");
     // Do not load these manually for now:
     // gSystem->Load("libStarGeneratorUtil.so");
     // gSystem->Load("libStarGeneratorEvent.so");
@@ -507,6 +507,7 @@ gSystem->Load("Pythia8_3_03.so");
     // StarRandom::capture();
 
     _primary = new StarPrimaryMaker();
+    //_primary->SetRunNumber(15130045);
 
     _primary->SetFileName("D0toy.starsim.root");
     chain->AddBefore("geant", _primary);

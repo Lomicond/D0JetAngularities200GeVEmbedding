@@ -1,6 +1,6 @@
 #include <vector>
 
-void runMixerD0toy_ZB()
+void runMixerD0toy_ZB_chopped1000()
 {
 	
    // gROOT->LoadMacro("bfcMixer_Hft_D0toy.C");
@@ -15,8 +15,8 @@ gROOT->LoadMacro("bfcMixer_Hft_D0toy_manualLoop.C");
 	triggers.push_back(450025);
 
     bfcMixer_Hft(
-        1,								//Number of events
-        "input/st_physics_15130045_raw_1000011.daq",
+        200,								//Number of events
+        "input/st_physics_15130045_raw_1000011.chopped_1000.daq",
         "input/st_physics_15130045_raw_1000011.tags.root",
         0.1,
         10.0,
