@@ -6,6 +6,7 @@
 #include "TROOT.h"
 #include "TSystem.h"
 #include <iostream>
+#include <fstream>
 #include "TH1.h"
 #include "TH2.h"
 #include "TH3.h"
@@ -27,15 +28,18 @@
 #include "StPhysicalHelixD.hh"
 #endif
 
-void makeMuDstQA(TString InputFileList, Int_t nFiles = 1, Int_t nEvents = 0, TString OutputDir = "output/" );
+void makeMuDstQA_Run14(TString InputFileList, Int_t nFiles = 1, Int_t nEvents = 0, TString OutputDir = "output/" );
 
-void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString OutputDir ) 
+void makeMuDstQA_Run14(TString InputFileList, Int_t nFiles, Int_t nEvents, TString OutputDir ) 
 {
  
   // Load libraries for CINT mode
 #ifdef __CINT__
   gROOT   -> Macro("loadMuDst.C");
 #endif
+
+  // Ensure the output directory exists.
+  gSystem->mkdir(OutputDir, kTRUE);
 
   // List of member links in the chain
   StChain*                    chain  =  new StChain ;
@@ -59,11 +63,19 @@ void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString Out
   //book histograms or trees if you need
   TString oFile(muDstMaker->GetFile());
   TString oChopFile;
-  int fileBeginIndex = oFile.Index("st_",0);
-  oFile.Remove(0,fileBeginIndex);
-  short indx1 = oFile.First('.');
-  short indx2 = oFile.Last('.');
-  if (indx1!=indx2) oFile.Remove(indx1+1,(indx2-indx1));
+
+  Ssiz_t fileBeginIndex = oFile.Index("st_", 0);
+  if (fileBeginIndex >= 0) {
+    oFile.Remove((Ssiz_t)0, (Ssiz_t)fileBeginIndex);
+  }
+
+  Ssiz_t indx1 = oFile.First('.');
+  Ssiz_t indx2 = oFile.Last('.');
+
+  if (indx1 >= 0 && indx2 >= 0 && indx1 != indx2) {
+    oFile.Remove((Ssiz_t)(indx1 + 1), (Ssiz_t)(indx2 - indx1));
+  }
+
   oChopFile=oFile;
   oFile.Insert(indx1+1,"moretags.");
   oFile.Prepend(OutputDir);
@@ -118,6 +130,9 @@ void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString Out
   
   // chain -> EventLoop(1,nEvents) ;  //will output lots of useless debugging info.
   Int_t istat = 0, i = 1;
+  Long64_t nReadOK = 0;
+  Long64_t nSelected = 0;
+
   while (i <= nEvents && istat != 2) {
      if(i%10==0)cout << endl << "== Event " << i << " start ==" << endl;
      chain->Clear();
@@ -130,6 +145,7 @@ void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString Out
      i++;
 
      if(istat != kStOK)continue; //skip those suspectible events
+     ++nReadOK;
      
   // ---------------- modify here according to your QA purpose --------------------------
      //let's do the QA here...
@@ -138,12 +154,12 @@ void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString Out
 
      StMuDst* mMuDst = muDstMaker->muDst();
      if(!mMuDst) {
-	  LOG_WARN << " No MuDst " << endm; continue;
+	  cout << "No MuDst" << endl; continue;
      }
 
      StMuEvent* mMuEvent = mMuDst->event();
      if(!mMuEvent) {
-	  LOG_WARN << " No MuEvent " << endm; continue;
+	  cout << "No MuEvent" << endl; continue;
      }
 
      //vzVpd
@@ -153,25 +169,26 @@ void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString Out
 
      //-----------------------------------------------------------------------------
      //vertex selection in StPicoDstMaker
-     enum PicoVtxMode {NotSet=0, Default=1, Vpd=2, VpdOrDefault=3};
-     PicoVtxMode mVtxMode;
+     const Int_t kVtxModeDefault      = 1;
+     const Int_t kVtxModeVpd          = 2;
+     const Int_t kVtxModeVpdOrDefault = 3;
 
-     //MUST assign this line!!!
-     mVtxMode = VpdOrDefault;
-     const double mTpcVpdVzDiffCut = 3;
+     // Run14 selection used for MoreTags/chopper production.
+     Int_t mVtxMode = kVtxModeVpdOrDefault;
+     const double mTpcVpdVzDiffCut = 3.0;
 
      int const originalVertexId = mMuDst->currentVertexIndex();
 
-     StMuPrimaryVertex* selectedVertex = nullptr;
+     StMuPrimaryVertex* selectedVertex = 0;
 
-     if (mVtxMode == Default) {
+     if (mVtxMode == kVtxModeDefault) {
 	  // choose the default vertex, i.e. the first vertex
 	  mMuDst->setVertexIndex(0);
 	  selectedVertex = mMuDst->primaryVertex();
      }
-     else if (mVtxMode == Vpd || mVtxMode == VpdOrDefault) {
+     else if (mVtxMode == kVtxModeVpd || mVtxMode == kVtxModeVpdOrDefault) {
 
-	  if(mVtxMode == VpdOrDefault) {
+	  if(mVtxMode == kVtxModeVpdOrDefault) {
 	     mMuDst->setVertexIndex(0);
 	     selectedVertex = mMuDst->primaryVertex();
 	  }
@@ -192,15 +209,15 @@ void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString Out
 		  } //if (fabs(vzVPD - vtx->position().z()) < mTpcVpdVzDiffCut)
 	     } //for (unsigned int iVtx = 0; iVtx < mMuDst->numberOfPrimaryVertices(); ++iVtx)
 	  } //if (mBTofHeader && fabs(mBTofHeader->vpdVz()) < 200)
-     } //else if (mVtxMode == Vpd || mVtxMode == VpdOrDefault)
+     } //else if (mVtxMode == kVtxModeVpd || mVtxMode == kVtxModeVpdOrDefault)
      else { // default case
-	  LOG_ERROR << "Pico Vtx Mode not set!" << endm;
+	  cout << "Pico Vtx Mode not set!" << endl;
      }
 
      // fall back to default vertex if no vertex is selected in the algorithm above.
      // should skip this event in the event cuts below.
      if ( ! selectedVertex ){
-	  LOG_INFO << "Vertex is not valid" << endm;
+	  cout << "Vertex is not valid" << endl;
 	  //cout<<originalVertexId<<endl;
 	  mMuDst->setVertexIndex(originalVertexId);
      }
@@ -286,8 +303,8 @@ void makeMuDstQA(TString InputFileList, Int_t nFiles, Int_t nEvents, TString Out
      }
      mngRefMult = nGlTrack;
 
-     //Comment out this line for HFT embedding!
-     mMoreTagsTree->Fill();
+     // HFT embedding mode: MoreTags must contain exactly the same
+     // selected events, in the same order, as the chopper list.
 
      //Event info (for debug)
      //cout<<"Run#: "<<mMuEvent->runNumber()<<endl;
@@ -316,8 +333,11 @@ if ( ! mMuEvent->triggerIdCollection().nominal().isTrigger(450050) &&
      //if ( fabs(mMuEvent->primaryVertexPosition().x()) < 1e-5 && fabs(mMuEvent->primaryVertexPosition().y()) < 1e-5 && fabs(mMuEvent->primaryVertexPosition().z()) < 1e-5 ) continue;
 
      chop_output<<mRunId<<'\t'<<mEvtId<<endl;
-     //for HFT ONLY! PrepEmbd will not be used, event cuts are done here!
-     //mMoreTagsTree->Fill();
+
+     // For HFT embedding, fill MoreTags only after all event cuts.
+     // This guarantees entry-by-entry alignment with chopper.txt.
+     mMoreTagsTree->Fill();
+     ++nSelected;
      
      /*
      //fill Event QA histograms
@@ -338,6 +358,13 @@ if ( ! mMuEvent->triggerIdCollection().nominal().isTrigger(450050) &&
      //end of the filling
      */
   }
+
+  cout << "makeMuDstQA summary:" << endl
+       << "  good MuDst events read = " << nReadOK << endl
+       << "  selected events        = " << nSelected << endl
+       << "  MoreTags entries       = " << mMoreTagsTree->GetEntries() << endl
+       << "  MoreTags output        = " << oFile << endl
+       << "  Chopper output         = " << oChopFile << endl;
 
   if (nEvents > 1) chain -> Finish() ;
 

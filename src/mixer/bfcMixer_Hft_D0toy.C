@@ -3,6 +3,7 @@ class StChain;
 StChain  *Chain=0;
 class StBFChain;
 StBFChain *chain1, *chain2, *chain3;
+class StIOMaker;
 
 //_____________________________________________________________________
 void bfcMixer_Hft(Int_t Nevents=1  ,
@@ -101,13 +102,13 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
   	chain2 = chain;
   	chain2->SetName("Two"); 
   	St_geant_Maker *geantMk = (St_geant_Maker*) chain2->GetMaker("geant");
- // 	if (geantMk) {
-  //	  	geantMk->SetMode(1);   // Mixer mode - do not modify EvtHddr
- // 	  	cout << "D0toy: geant maker set to mixer mode, SetMode(1)" << endl;
- // 	} else {
- // 	  	cout << "D0toy: WARNING: geant maker not found in chain2" << endl;
- // 	}  	
-  	Chain->cd();
+  	if (geantMk) {
+  	  	geantMk->SetMode(1);   // Mixer mode - do not modify EvtHddr
+  	  	cout << "D0toy: geant maker set to mixer mode, SetMode(1)" << endl;
+  	} else {
+  	  	cout << "D0toy: WARNING: geant maker not found in chain2" << endl;
+  	}  	
+ 	Chain->cd();
   	if (chain2->GetOption("TRS")){
     	StTrsMaker *trsMk = (StTrsMaker *) chain2->GetMaker("Trs");
     	if (! trsMk) {
@@ -298,8 +299,9 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
   if(!bPythia)Chain->SetAttr(".Privilege",1,"StPrepEmbedMaker::*"); //It is also IO maker
   //  Chain->SetDEBUG(0);
 
-  if (Nevents < 0) return;
 
+  if (Nevents < 0) return;
+ 
   Int_t iInit = Chain->Init();
   if (iInit >=  kStEOF) {Chain->FatalErr(iInit,"on init"); return;}
   StMaker *treeMk = Chain->GetMaker("outputStream");
@@ -318,7 +320,115 @@ if (nskip>0) {
 } 
   }
 
-  Chain->EventLoop(Nevents,treeMk);
+  // --------------------------------------------------------------------------
+  // D0toy manual event loop test.
+  //
+  // This replaces:
+  //
+  //   Chain->EventLoop(Nevents, treeMk);
+  //
+  // by an explicit Chain->Make(iEvent) loop, following the style used in
+  // bfcMixer_Jet.C.  The goal is diagnostic: print what the full Chain thinks
+  // the run/event numbers are at the end of each mixed event.
+  // --------------------------------------------------------------------------
+
+  StIOMaker *inputStream = (StIOMaker*)chain1->GetMaker("inputStream");
+  if (!inputStream) {
+    cout << "D0toyManualLoop: WARNING: inputStream maker was not found in chain1" << endl;
+  }
+
+  Int_t nTotal  = 0;
+  Int_t nFailed = 0;
+  Int_t iMake   = kStOK;
+
+  TBenchmark evnt;
+
+  for (Int_t iEvent = 1; iEvent <= Nevents; ++iEvent) {
+
+    evnt.Reset();
+    evnt.Start("D0toyManualLoop");
+
+Chain->Clear();
+
+Int_t ret1 = chain1 ? chain1->Make(iEvent) : -999;
+
+Int_t daqRun = chain1 ? chain1->GetRunNumber()    : -999;
+Int_t daqEvt = chain1 ? chain1->GetEventNumber()  : -999;
+
+Int_t ret2 = chain2 ? chain2->Make(iEvent) : -999;
+
+// tady se musí opravit header PŘED chain3->Make()
+StEvtHddr *fEvtHddr = (StEvtHddr*)Chain->GetDataSet("EvtHddr");
+
+if (fEvtHddr) {
+  fEvtHddr->SetRunNumber(daqRun);
+  fEvtHddr->SetEventNumber(daqEvt);
+  cout << "D0toy: restored EvtHddr before chain3"
+       << " run=" << daqRun
+       << " evt=" << daqEvt
+       << endl;
+}
+
+Int_t ret3 = chain3 ? chain3->Make(iEvent) : -999;
+
+iMake = ret3;
+	if (iMake == kStErr) ++nFailed;
+
+    // Same EOF handling as in bfcMixer_Jet.C:
+    // if the DAQ input stream reaches EOF, rewind the real-data input and
+    // repeat the same requested event number.
+    if (inputStream && inputStream->GetMakeReturn() % 10 == kStEOF) {
+      cout << "D0toyManualLoop: inputStream reached EOF, rewinding DAQ input" << endl;
+      inputStream->Rewind();
+      --iEvent;
+      continue;
+    }
+
+    if (iMake % 10 == kStEOF || iMake % 10 == kStFatal) {
+      cout << "D0toyManualLoop: stopping event loop, iMake = " << iMake << endl;
+      break;
+    }
+
+    ++nTotal;
+
+    evnt.Stop("D0toyManualLoop");
+
+    printf("D0toyManualLoop: Done with Event [requested %d / Chain run %d / Chain evt %d / Date.Time %d.%d / iMake %d / chain1 %d / chain2 %d / chain3 %d / inputStream %d] Real Time = %10.2f s Cpu Time = %10.2f s\n",
+           iEvent,
+           Chain->GetRunNumber(),
+           Chain->GetEventNumber(),
+           Chain->GetDate(),
+           Chain->GetTime(),
+           iMake,
+           chain1 ? chain1->GetMakeReturn() : -999,
+           chain2 ? chain2->GetMakeReturn() : -999,
+           chain3 ? chain3->GetMakeReturn() : -999,
+           inputStream ? inputStream->GetMakeReturn() : -999,
+           evnt.GetRealTime("D0toyManualLoop"),
+           evnt.GetCpuTime("D0toyManualLoop"));
+
+    // Extra compact line that is easy to grep from the log.
+    cout << "D0toyManualLoopSummary"
+         << " requested=" << iEvent
+         << " chainRun=" << Chain->GetRunNumber()
+         << " chainEvt=" << Chain->GetEventNumber()
+         << " chainDate=" << Chain->GetDate()
+         << " chainTime=" << Chain->GetTime()
+         << " iMake=" << iMake
+         << " chain1Return=" << (chain1 ? chain1->GetMakeReturn() : -999)
+         << " chain2Return=" << (chain2 ? chain2->GetMakeReturn() : -999)
+         << " chain3Return=" << (chain3 ? chain3->GetMakeReturn() : -999)
+         << " inputReturn=" << (inputStream ? inputStream->GetMakeReturn() : -999)
+         << endl;
+  }
+
+  cout << "D0toyManualLoop: EventLoop completed code " << iMake << endl;
+
+  {
+    TDatime t;
+    gMessMgr->QAInfo() << Form("Run is finished at Date/Time %i/%i; Total events processed: %i and not completed: %i",
+                               t.GetDate(), t.GetTime(), nTotal, nFailed) << endm;
+  }
 
   gMessMgr->QAInfo() << "Run completed " << endm;
   gSystem->Exec("date");

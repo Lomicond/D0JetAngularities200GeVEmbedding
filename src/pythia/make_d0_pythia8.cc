@@ -18,8 +18,15 @@ int main(int argc, char* argv[])
     // ------------------------------------------------------------
     const int nAcceptedTarget = (argc > 1) ? std::atoi(argv[1]) : 10000;
     const int seed            = (argc > 2) ? std::atoi(argv[2]) : 12345;
+    const std::string configFile = (argc > 3) ? argv[3] : "detroit.cmnd";
+    const std::string outputFile = (argc > 4) ? argv[4] : "pythia8_D0_DetroitTune.root";
 
-    const double eCM = 200.0;        // GeV
+    if (nAcceptedTarget <= 0) {
+        std::cerr << "Number of accepted events must be > 0." << std::endl;
+        return 2;
+    }
+
+    //const double eCM = 200.0;        // GeV
     const double d0PtMin = 1.0;      // GeV/c
     const double d0PtMax = 10.0;     // GeV/c
     
@@ -48,7 +55,17 @@ int main(int argc, char* argv[])
     // pythia.readString("Tune:pp = 33");
     //
     // Option B: robust/manual version:
-    pythia.readFile("detroit.cmnd");
+    if (!pythia.readFile(configFile)) {
+        std::cerr << "Could not read PYTHIA config file: "
+                  << configFile << std::endl;
+        return 3;
+    }
+
+    std::cout << "Configuration:\n"
+              << "  accepted target = " << nAcceptedTarget << "\n"
+              << "  seed            = " << seed << "\n"
+              << "  config          = " << configFile << "\n"
+              << "  output          = " << outputFile << std::endl;
 
     // Charm-enriched production.
     // This is practical for statistics. If you need unbiased minbias later,
@@ -74,7 +91,12 @@ int main(int argc, char* argv[])
     // ------------------------------------------------------------
     // Output ROOT file
     // ------------------------------------------------------------
-    TFile* fout = new TFile("pythia8_D0_DetroitTune.root", "RECREATE");
+    TFile* fout = TFile::Open(outputFile.c_str(), "RECREATE");
+    if (!fout || fout->IsZombie()) {
+        std::cerr << "Could not create output ROOT file: "
+                  << outputFile << std::endl;
+        return 4;
+    }
     TTree* tree = new TTree("D0Tree", "PYTHIA8 D0 events with Detroit tune");
 
     int acceptedEvent = 0;
@@ -237,7 +259,6 @@ int main(int argc, char* argv[])
         part_vy.push_back(p.yProd());
         part_vz.push_back(p.zProd());
         part_vt.push_back(p.tProd());
-        part_pythiaIndex.push_back(i);
     }
 
     acceptedEvent = nAccepted;
@@ -261,7 +282,7 @@ int main(int argc, char* argv[])
     std::cout << "\nDone.\n"
               << "Accepted events: " << nAccepted << "\n"
               << "Tried events:    " << nTries << "\n"
-              << "Output:          pythia8_D0_DetroitTune.root\n";
+              << "Output:          " << outputFile << "\n";
 
     if (nAccepted < nAcceptedTarget) {
         std::cerr << "Warning: target number of accepted events was not reached.\n";
