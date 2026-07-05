@@ -1,45 +1,47 @@
-# ROOT / STAR binary outputs
+# ============================================================
+# Generated STAR / ROOT data
+# ============================================================
 *.root
 *.fzd
 *.daq
-*.MuDst.root
-*.picoDst.root
-*.geant.root
-*.geom.root
-*.hist.root
-*.runco.root
-*.event.root
-*.McEvent.root
-*.minimc.root
-*.tags.root
 
-# ROOT / CINT / ACLiC generated files
-AutoDict*
-*_C.so
-*_C.d
-*_C_ACLiC_dict.*
+# ============================================================
+# Logs and runtime outputs
+# ============================================================
+*.log
+logs/*
+work/*
+output/*
+
+# Keep empty runtime directories in Git
+!logs/.gitkeep
+!work/.gitkeep
+!output/.gitkeep
+
+# ============================================================
+# Local large inputs
+# ============================================================
+input/daq/*
+input/mudst/*
+
+!input/daq/.gitkeep
+!input/mudst/.gitkeep
+
+# ============================================================
+# ROOT / ACLiC temporary files
+# ============================================================
 *.so
 *.d
 *.pcm
+*_C.so
+*_C.d
+*_C_ACLiC_dict_rdict.pcm
 
-# Logs and temporary files
-*.log
+# ============================================================
+# Misc temporary files
+# ============================================================
 paw.metafile
-*.out
-*.err
-core
-core.*
-
-# Local compiled executables
-Pythia/make_d0_pythia8
-Pythia/make_d0_pythia8_8317
-make_d0_pythia8
-make_d0_pythia8_8317
-
-# Editor / OS clutter
 *~
 *.swp
+*.swo
 .DS_Store
-
-# Keep empty folders if needed
-!.gitkeep
