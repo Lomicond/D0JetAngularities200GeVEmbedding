@@ -1,4 +1,4 @@
-// makePicoDstFromMuDst.C - Stage 6 v2
+// makePicoDstFromMuDst.C - Stage 6 v3
 //
 // Stage 6 of the D0EmbeddingClean workflow:
 //   reconstructed embedding MuDst -> PicoDst
@@ -133,12 +133,21 @@ void makePicoDstFromMuDst(
     muDstMaker->SetStatus("Emc*", 1);
     muDstMaker->SetStatus("MTD*", 1);
 
+    // Preserve embedding MC truth in the output PicoDst.
+    //
+    // Important for SL22c: enabling the individual names
+    // "StMuMcVertex" / "StMuMcTrack" is not sufficient here.  The tested
+    // StMuDstMaker group selector "MCAll" enables both MC arrays, which are
+    // then consumed by StPicoDstMaker to fill PicoDst McVertex and McTrack.
+    muDstMaker->SetStatus("MCAll", 1);
+
     // STAR DB and makers used by the public picoDst conversion macro.
     //
     // FMS/FPS/FPOST support is intentionally omitted in this D0-jet workflow:
     // those detectors are not used by the midrapidity analysis and their Run14
     // DB initialization produces large amounts of irrelevant error output.
-    // Tracks, vertices, BTOF, BEMC/EEMC, MTD and PicoDst writing are unchanged.
+    // Tracks, vertices, BTOF, BEMC/EEMC, MTD, MC truth and PicoDst writing
+    // remain enabled.
     St_db_Maker *dbMk =
         new St_db_Maker("db", "MySQL:StarDb", "$STAR/StarDb", "StarDb");
 
