@@ -2,6 +2,8 @@
 // STAR  C++  framework and get the starsim prompt
 // To use it do
 //  root4star starsim.C
+// Stage 2B: event-by-event MoreTags matching (vertex, Run/Event metadata,
+// DB timestamps and magnetic field) following STAR Run14 embedding conventions.
 #include "TFile.h"
 #include "TTree.h"
 #include "TMath.h"
@@ -16,7 +18,6 @@
 //#include "StarGenerator/DECAY/AgUDecay.h"
 //#include "StarGenerator/DECAY/StarDecayManager.h"
 #include "TParticlePDG.h"
-#include "StarGenerator/EVENT/StarGenParticle.h"
 
 #include "TTable.h"
 
@@ -53,6 +54,23 @@ std::vector<double> *part_m  = 0;
 
 Long64_t gPythiaEntry   = 0;
 Long64_t gPythiaEntries = 0;
+
+// MoreTags input and event-by-event metadata
+TFile *gMoreTagsFile = 0;
+TTree *gMoreTagsTree = 0;
+
+Int_t    gTagRunId     = 0;
+Int_t    gTagEvtId     = 0;
+Double_t gTagVX        = 0.0;
+Double_t gTagVY        = 0.0;
+Double_t gTagVZ        = 0.0;
+Double_t gTagEvtTime   = 0.0;
+Double_t gTagProdTime  = 0.0;
+Double_t gTagMagField  = 0.0;
+
+Long64_t gMoreTagsEntries = 0;
+Double_t gGeometryMagField = 0.0;
+Int_t    gFirstRunId       = 0;
 
 const Bool_t printFirstEvent = kFALSE;
 void PrintG2TRawRows()
@@ -111,6 +129,115 @@ void geometry( TString tag, Bool_t agml=true )
   geant_maker -> LoadGeometry(cmd);
   //  if ( agml ) command("gexec $STAR_LIB/libxgeometry.so");
 }
+//-----------------------------------------------------------------------------
+Bool_t CheckMoreTagsBranch(const char *name)
+{
+    if (!gMoreTagsTree || !gMoreTagsTree->GetBranch(name)) {
+        cout << "ERROR: Missing MoreTags branch: " << name << endl;
+        return kFALSE;
+    }
+    return kTRUE;
+}
+
+//-----------------------------------------------------------------------------
+void OpenMoreTagsTree(const char *fname)
+{
+    TDirectory *savedDir = gDirectory;
+
+    gMoreTagsFile = TFile::Open(fname, "READ");
+
+    if (!gMoreTagsFile || gMoreTagsFile->IsZombie()) {
+        cout << "ERROR: Cannot open MoreTags file: " << fname << endl;
+        gMoreTagsFile = 0;
+        gMoreTagsTree = 0;
+        if (savedDir) savedDir->cd();
+        return;
+    }
+
+    gMoreTagsTree = (TTree*)gMoreTagsFile->Get("MoreTags");
+
+    if (!gMoreTagsTree) {
+        cout << "ERROR: Cannot find MoreTags tree in file: " << fname << endl;
+        if (savedDir) savedDir->cd();
+        return;
+    }
+
+    Bool_t ok = kTRUE;
+    ok = CheckMoreTagsBranch("RunId")     && ok;
+    ok = CheckMoreTagsBranch("EvtId")     && ok;
+    ok = CheckMoreTagsBranch("VX")        && ok;
+    ok = CheckMoreTagsBranch("VY")        && ok;
+    ok = CheckMoreTagsBranch("VZ")        && ok;
+    ok = CheckMoreTagsBranch("EvtTime")   && ok;
+    ok = CheckMoreTagsBranch("ProdTime")  && ok;
+    ok = CheckMoreTagsBranch("magField")  && ok;
+
+    if (!ok) {
+        cout << "ERROR: MoreTags input is missing required branches." << endl;
+        gMoreTagsTree = 0;
+        if (savedDir) savedDir->cd();
+        return;
+    }
+
+    gMoreTagsTree->SetBranchAddress("RunId",    &gTagRunId);
+    gMoreTagsTree->SetBranchAddress("EvtId",    &gTagEvtId);
+    gMoreTagsTree->SetBranchAddress("VX",       &gTagVX);
+    gMoreTagsTree->SetBranchAddress("VY",       &gTagVY);
+    gMoreTagsTree->SetBranchAddress("VZ",       &gTagVZ);
+    gMoreTagsTree->SetBranchAddress("EvtTime",  &gTagEvtTime);
+    gMoreTagsTree->SetBranchAddress("ProdTime", &gTagProdTime);
+    gMoreTagsTree->SetBranchAddress("magField", &gTagMagField);
+
+    gMoreTagsEntries = gMoreTagsTree->GetEntries();
+
+    cout << "Opened MoreTags tree: " << fname
+         << ", entries = " << gMoreTagsEntries << endl;
+
+    if (savedDir) savedDir->cd();
+}
+
+//-----------------------------------------------------------------------------
+Bool_t ReadMoreTagsEntry(Long64_t entry)
+{
+    if (!gMoreTagsTree) {
+        cout << "ERROR: MoreTags tree is not open." << endl;
+        return kFALSE;
+    }
+
+    if (entry < 0 || entry >= gMoreTagsEntries) {
+        cout << "ERROR: MoreTags entry out of range: " << entry
+             << " / " << gMoreTagsEntries << endl;
+        return kFALSE;
+    }
+
+    const Long64_t nbytes = gMoreTagsTree->GetEntry(entry);
+
+    if (nbytes <= 0) {
+        cout << "ERROR: Failed to read MoreTags entry " << entry << endl;
+        return kFALSE;
+    }
+
+    return kTRUE;
+}
+
+//-----------------------------------------------------------------------------
+void CloseInputFiles()
+{
+    if (gPythiaFile) {
+        gPythiaFile->Close();
+        delete gPythiaFile;
+        gPythiaFile = 0;
+        gPythiaTree = 0;
+    }
+
+    if (gMoreTagsFile) {
+        gMoreTagsFile->Close();
+        delete gMoreTagsFile;
+        gMoreTagsFile = 0;
+        gMoreTagsTree = 0;
+    }
+}
+
 //-----------------------------------------------------------------------------
 void OpenPythiaTree(const char *fname)
 {
@@ -321,109 +448,164 @@ void SetupD0Decay()
 void trig(Int_t n=1)
 {
     if (!gPythiaTree) {
-        cout << "No PYTHIA tree available. "
-             << "Open it before calling trig()." << endl;
+        cout << "ERROR: No PYTHIA tree available." << endl;
         return;
     }
 
-/*
-	PrintParticleName(22);
-PrintParticleName(11);
-PrintParticleName(-11);
-PrintParticleName(13);
-PrintParticleName(-13);
-PrintParticleName(2212);
-PrintParticleName(-2212);
-PrintParticleName(2112);
-PrintParticleName(-2112);
-PrintParticleName(130);
-PrintParticleName(310);
-PrintParticleName(3122);
-PrintParticleName(-3122);
-*/
-
-
+    if (!gMoreTagsTree) {
+        cout << "ERROR: No MoreTags tree available." << endl;
+        return;
+    }
 
     for (Int_t iev = 0; iev < n; iev++) {
 
-        if (gPythiaEntry >= gPythiaEntries) {
-            cout << "No more PYTHIA events." << endl;
+        const Long64_t entry = (Long64_t)iev;
+
+        if (entry >= gPythiaEntries || entry >= gMoreTagsEntries) {
+            cout << "ERROR: Synchronized input exhausted at entry "
+                 << entry << endl;
             break;
         }
 
         chain->Clear();
 
-        gPythiaTree->GetEntry(gPythiaEntry);
-        gPythiaEntry++;
-
-	Int_t nInput = part_id->size();
-	Int_t nAdded = 0;
-	Int_t nAddedD0 = 0;
-	Int_t nAddedD0bar = 0;
-
-	Int_t nSkippedNeutrino = 0;
-	Int_t nSkippedUnknown = 0;
-	Int_t nFailedAdd = 0;
-
-        for (size_t ip = 0; ip < part_id->size(); ip++) {
-
-		    const Int_t pdg = part_id->at(ip);
-		    const Int_t absPdg = TMath::Abs(pdg);
-
-		    // Neutrinos are useless for detector simulation.
-		    //12  = nu_e      // elektronové neutrino
-		    //14  = nu_mu     // mionové neutrino
-		    //16  = nu_tau    // tau neutrino
-		    if (absPdg == 12 || absPdg == 14 || absPdg == 16) {
-			    nSkippedNeutrino++;
-			    continue;
-			}
-
-		// Particles without verified STAR name
-		const char* name = ParticleNameFromPdg(pdg);
-		if (!name || name[0] == '\0') {
-		    nSkippedUnknown++;
-		    continue;
-		}
-
-		Bool_t added = AddPythiaParticleToStar(pdg,
-				                       part_px->at(ip),
-				                       part_py->at(ip),
-				                       part_pz->at(ip),
-				                       part_e->at(ip));
-
-		if (!added) {
-		    nFailedAdd++;
-		    continue;
-		}
-
-		nAdded++;
-
-		if (pdg == 421)  nAddedD0++;
-		if (pdg == -421) nAddedD0bar++;
-
+        // Read the same entry index from MoreTags and PYTHIA.
+        // This is the event-by-event synchronization used for Stage 2B.
+        if (!ReadMoreTagsEntry(entry)) {
+            cout << "ERROR: Failed to read MoreTags entry " << entry << endl;
+            break;
         }
-        
-		cout << "PYTHIA event " << gPythiaEntry-1
-		     << " input = " << nInput
-		     << ", added = " << nAdded
-		     << ", added D0 = " << nAddedD0
-		     << ", added D0bar = " << nAddedD0bar
-		     << ", skipped neutrino = " << nSkippedNeutrino
-		     << ", skipped unknown = " << nSkippedUnknown
-		     << ", failed add = " << nFailedAdd
-		     << endl;
 
-        chain->Make();
-  /*      if (iev == 0) {
-    PrintG2TRawRows();
-}*/
+        const Long64_t pythiaBytes = gPythiaTree->GetEntry(entry);
+        if (pythiaBytes <= 0) {
+            cout << "ERROR: Failed to read PYTHIA entry " << entry << endl;
+            break;
+        }
+        gPythiaEntry = entry + 1;
 
+        // Apply the real-data collision vertex globally through
+        // StarPrimaryMaker. Individual PYTHIA particles remain at local
+        // production point (0,0,0) in AddPythiaParticleToStar().
+        _primary->SetVertex(gTagVX, gTagVY, gTagVZ);
+        _primary->SetSigma(0.0, 0.0, 0.0);
 
-	if (printFirstEvent && iev == 0 && _primary && _primary->event()) {
-	    _primary->event()->Print();
-	}
-	
+        // Follow the official Run14 embedding convention.
+        command(Form("RUNG %i %i", gTagRunId, gTagEvtId - 1));
+
+        // Intentionally reproduce runEmbeddingSimulation2014.C here.
+        // MoreTags packs EvtTime as YYYYMMDD + HHMMSS/1e6, while the
+        // official macro decodes with 1e5. This will be revisited only
+        // after the full workflow is operational, to keep Stage 2B
+        // attributable to the official reference behavior.
+        const Int_t eventDate = (Int_t)gTagEvtTime;
+        const Int_t eventTime = (Int_t)(
+            100000.0 * (gTagEvtTime - (Double_t)eventDate)
+        );
+        chain->SetDateTime(eventDate, eventTime);
+
+        if (TMath::Abs(gTagMagField - gGeometryMagField) > 0.01) {
+            cout << "WARNING: event " << entry
+                 << " has magField=" << gTagMagField
+                 << ", while geometry was initialized with "
+                 << gGeometryMagField << endl;
+        }
+
+        Int_t nInput = part_id ? (Int_t)part_id->size() : 0;
+        Int_t nAdded = 0;
+        Int_t nAddedD0 = 0;
+        Int_t nAddedD0bar = 0;
+        Int_t nSkippedNeutrino = 0;
+        Int_t nSkippedUnknown = 0;
+        Int_t nFailedAdd = 0;
+
+        if (!part_id || !part_px || !part_py || !part_pz || !part_e) {
+            cout << "ERROR: Null PYTHIA particle vector at entry "
+                 << entry << endl;
+            break;
+        }
+
+        const size_t nParticles = part_id->size();
+
+        if (part_px->size() != nParticles ||
+            part_py->size() != nParticles ||
+            part_pz->size() != nParticles ||
+            part_e->size()  != nParticles) {
+            cout << "ERROR: Inconsistent PYTHIA particle vector sizes at entry "
+                 << entry << endl;
+            break;
+        }
+
+        for (size_t ip = 0; ip < nParticles; ip++) {
+
+            const Int_t pdg = part_id->at(ip);
+            const Int_t absPdg = TMath::Abs(pdg);
+
+            // Neutrinos are useless for detector simulation.
+            if (absPdg == 12 || absPdg == 14 || absPdg == 16) {
+                nSkippedNeutrino++;
+                continue;
+            }
+
+            // Particles without verified STAR name.
+            const char* name = ParticleNameFromPdg(pdg);
+            if (!name || name[0] == '\0') {
+                nSkippedUnknown++;
+                continue;
+            }
+
+            const Bool_t added = AddPythiaParticleToStar(
+                pdg,
+                part_px->at(ip),
+                part_py->at(ip),
+                part_pz->at(ip),
+                part_e->at(ip)
+            );
+
+            if (!added) {
+                nFailedAdd++;
+                continue;
+            }
+
+            nAdded++;
+
+            if (pdg == 421)  nAddedD0++;
+            if (pdg == -421) nAddedD0bar++;
+        }
+
+        cout << "MATCHED event " << entry
+             << ": RunId=" << gTagRunId
+             << ", EvtId=" << gTagEvtId
+             << ", vertex=(" << gTagVX
+             << ", " << gTagVY
+             << ", " << gTagVZ << ")"
+             << ", EvtTime=" << gTagEvtTime
+             << ", ProdTime=" << gTagProdTime
+             << ", magField=" << gTagMagField
+             << ", decodedDate=" << eventDate
+             << ", decodedTime=" << eventTime
+             << endl;
+
+        cout << "PYTHIA event " << entry
+             << " input = " << nInput
+             << ", added = " << nAdded
+             << ", added D0 = " << nAddedD0
+             << ", added D0bar = " << nAddedD0bar
+             << ", skipped neutrino = " << nSkippedNeutrino
+             << ", skipped unknown = " << nSkippedUnknown
+             << ", failed add = " << nFailedAdd
+             << endl;
+
+        const Int_t makeStatus = chain->Make();
+
+        if (makeStatus != kStOK) {
+            cout << "ERROR: chain->Make() returned status "
+                 << makeStatus << " for matched entry " << entry << endl;
+            break;
+        }
+
+        if (printFirstEvent && iev == 0 && _primary && _primary->event()) {
+            _primary->event()->Print();
+        }
     }
 }
 /*
@@ -476,77 +658,174 @@ void Kinematics()
 // ----------------------------------------------------------------------------
 void starsim(Int_t nevents = 1,
              const char *pythiaInput = "Pythia/pythia8_D0_DetroitTune.root",
+             const char *moreTagsInput = "moretags.root",
              const char *starsimRootOutput = "D0toy.starsim.root",
-             const char *fzdOutput = "D0toy.starsim.fzd",
-             Double_t magneticField = -5.005)
+             const char *fzdOutput = "D0toy.starsim.fzd")
 {
     if (nevents <= 0) {
         cout << "ERROR: nevents must be > 0" << endl;
         return;
     }
 
-    cout << "STARSIM configuration:" << endl
+    // ------------------------------------------------------------------------
+    // Open MoreTags first. The first selected real-data event defines the
+    // initial STAR DB timestamps and the magnetic field, following the Run14
+    // embedding reference macro.
+    OpenMoreTagsTree(moreTagsInput);
+
+    if (!gMoreTagsTree) {
+        cout << "ERROR: MoreTags input initialization failed." << endl;
+        CloseInputFiles();
+        return;
+    }
+
+    if (gMoreTagsEntries <= 0) {
+        cout << "ERROR: MoreTags tree is empty." << endl;
+        CloseInputFiles();
+        return;
+    }
+
+    if (!ReadMoreTagsEntry(0)) {
+        cout << "ERROR: Cannot read first MoreTags entry." << endl;
+        CloseInputFiles();
+        return;
+    }
+
+    gGeometryMagField = gTagMagField;
+    gFirstRunId = gTagRunId;
+
+    TString SDT;
+    SDT.Form("sdt%i", (Int_t)gTagEvtTime);
+
+    TString DBV;
+    DBV.Form("dbv%i", (Int_t)gTagProdTime);
+
+    cout << "STARSIM Stage 2B configuration:" << endl
          << "  events          = " << nevents << endl
          << "  PYTHIA input    = " << pythiaInput << endl
+         << "  MoreTags input  = " << moreTagsInput << endl
          << "  ROOT output     = " << starsimRootOutput << endl
          << "  FZD output      = " << fzdOutput << endl
-         << "  magnetic field  = " << magneticField << endl;
+         << "  first RunId     = " << gTagRunId << endl
+         << "  first EvtId     = " << gTagEvtId << endl
+         << "  first vertex    = (" << gTagVX << ", "
+                                  << gTagVY << ", "
+                                  << gTagVZ << ")" << endl
+         << "  first EvtTime   = " << gTagEvtTime << endl
+         << "  first ProdTime  = " << gTagProdTime << endl
+         << "  magnetic field  = " << gGeometryMagField << endl
+         << "  SDT             = " << SDT.Data() << endl
+         << "  DBV             = " << DBV.Data() << endl;
 
+    // ------------------------------------------------------------------------
+    // Build the same Stage 2A chain, now with SDT/DBV dates taken from the
+    // first MoreTags entry. Keep y2014a and the existing chain options unchanged
+    // so Stage 2B isolates event matching/metadata rather than changing geometry.
     gROOT->ProcessLine(".L bfc.C");
     {
-        TString simple = "y2014a geant gstar usexgeom agml ";
+        TString simple = "y2014a ";
+        simple += SDT;
+        simple += " ";
+        simple += DBV;
+        simple += " geant gstar usexgeom agml ";
+
+        cout << "  BFC options     = " << simple.Data() << endl;
         bfc(0, simple);
     }
 
-gSystem->Load("libVMC.so");
+    gSystem->Load("libVMC.so");
 
-gSystem->Load("StarGeneratorUtil.so");
-gSystem->Load("StarGeneratorEvent.so");
-gSystem->Load("StarGeneratorBase.so");
+    gSystem->Load("StarGeneratorUtil.so");
+    gSystem->Load("StarGeneratorEvent.so");
+    gSystem->Load("StarGeneratorBase.so");
 
-gSystem->Load("libMathMore.so");
-gSystem->Load("xgeometry.so");
+    gSystem->Load("libMathMore.so");
+    gSystem->Load("xgeometry.so");
 
-gSystem->Load("StarGeneratorDecay.so");
-gSystem->Load("Pythia8_3_03.so");
-TString geometryCommand;
-geometryCommand.Form("field=%g y2014a", magneticField);
-geometry(geometryCommand);
-    // Do not load these manually for now:
-    // gSystem->Load("libStarGeneratorUtil.so");
-    // gSystem->Load("libStarGeneratorEvent.so");
-    // gSystem->Load("libStarGeneratorBase.so");
+    gSystem->Load("StarGeneratorDecay.so");
+    gSystem->Load("Pythia8_3_03.so");
 
-    // Keep the current random-number treatment unchanged in Stage 2A.
-    // A STARSIM/GEANT seed will be handled separately once the official
-    // embedding convention is fixed.
+    TString geometryCommand;
+    geometryCommand.Form("field=%.9f y2014a", gGeometryMagField);
+    geometry(geometryCommand);
+
+    // Keep the Stage 2A random-number treatment unchanged for now.
+    // A production seed policy will be handled separately.
 
     _primary = new StarPrimaryMaker();
-    //_primary->SetRunNumber(15130045);
-
     _primary->SetFileName(starsimRootOutput);
     chain->AddBefore("geant", _primary);
 
     Kinematics();
-
-    //SetupD0InGeant3();
     SetupD0Decay();
-
 
     _primary->Init();
 
+    // ------------------------------------------------------------------------
+    // Open PYTHIA only after the STAR generator setup, as in Stage 2A.
     OpenPythiaTree(pythiaInput);
+
     if (!gPythiaTree) {
         cout << "ERROR: PYTHIA input initialization failed." << endl;
+        CloseInputFiles();
         return;
     }
 
-    if (nevents > gPythiaEntries) {
-        cout << "WARNING: requested " << nevents
-             << " STARSIM events, but PYTHIA tree contains only "
-             << gPythiaEntries << ". Processing available entries only."
-             << endl;
+    cout << "Input entry counts:" << endl
+         << "  PYTHIA   = " << gPythiaEntries << endl
+         << "  MoreTags = " << gMoreTagsEntries << endl;
+
+    // Event-by-event matching is physics-critical. Do not silently truncate.
+    if ((Long64_t)nevents > gPythiaEntries) {
+        cout << "ERROR: requested " << nevents
+             << " events, but PYTHIA contains only "
+             << gPythiaEntries << "." << endl;
+        CloseInputFiles();
+        return;
     }
+
+    if ((Long64_t)nevents > gMoreTagsEntries) {
+        cout << "ERROR: requested " << nevents
+             << " events, but MoreTags contains only "
+             << gMoreTagsEntries << "." << endl;
+        CloseInputFiles();
+        return;
+    }
+
+    if (gPythiaEntries != gMoreTagsEntries) {
+        cout << "WARNING: PYTHIA and MoreTags total entry counts differ. "
+             << "The requested synchronized range is still valid." << endl;
+    }
+
+    // Optional consistency scan over the synchronized range. The workflow is
+    // intended for one DAQ/MuDst pair (one run) per job.
+    for (Int_t i = 0; i < nevents; ++i) {
+        if (!ReadMoreTagsEntry(i)) {
+            cout << "ERROR: failed MoreTags preflight at entry " << i << endl;
+            CloseInputFiles();
+            return;
+        }
+
+        if (gTagRunId != gFirstRunId) {
+            cout << "ERROR: MoreTags contains multiple runs in requested range: "
+                 << "entry 0 RunId=" << gFirstRunId
+                 << ", entry " << i << " RunId=" << gTagRunId << endl;
+            CloseInputFiles();
+            return;
+        }
+
+        if (TMath::Abs(gTagMagField - gGeometryMagField) > 0.01) {
+            cout << "ERROR: MoreTags magnetic field changes in requested range: "
+                 << "entry 0 field=" << gGeometryMagField
+                 << ", entry " << i << " field=" << gTagMagField << endl;
+            CloseInputFiles();
+            return;
+        }
+    }
+
+    // Restore entry 0 before the event loop for deterministic diagnostics.
+    ReadMoreTagsEntry(0);
+    gPythiaEntry = 0;
 
     command("gkine -4 0");
 
@@ -558,14 +837,9 @@ geometry(geometryCommand);
 
     command("call agexit");
 
-    if (gPythiaFile) {
-        gPythiaFile->Close();
-        delete gPythiaFile;
-        gPythiaFile = 0;
-        gPythiaTree = 0;
-    }
+    CloseInputFiles();
 
-    cout << "STARSIM finished." << endl
+    cout << "STARSIM Stage 2B finished." << endl
          << "  ROOT output = " << starsimRootOutput << endl
          << "  FZD output  = " << fzdOutput << endl;
 }
