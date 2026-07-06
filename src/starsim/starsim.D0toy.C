@@ -2,11 +2,17 @@
 // STAR  C++  framework and get the starsim prompt
 // To use it do
 //  root4star starsim.C
-// Stage 2B: event-by-event MoreTags matching (vertex, Run/Event metadata,
-// DB timestamps and magnetic field) following STAR Run14 embedding conventions.
+// Stage 2C v2: event-by-event MoreTags matching plus the official Run14
+// simulation geometry/chain configuration (y2014x, misalign,
+// newtpcalignment, bigbig). Adds a minimal ROOT-directory finalization
+// guard so StarPrimaryMaker can write its final stats object after geometry
+// code changes gDirectory during initialization.
 #include "TFile.h"
 #include "TTree.h"
 #include "TMath.h"
+#include "TDirectory.h"
+#include "TList.h"
+#include "TSystem.h"
 
 #include "StarGenerator/EVENT/StarGenParticle.h"
 
@@ -216,6 +222,71 @@ Bool_t ReadMoreTagsEntry(Long64_t entry)
         cout << "ERROR: Failed to read MoreTags entry " << entry << endl;
         return kFALSE;
     }
+
+    return kTRUE;
+}
+
+//-----------------------------------------------------------------------------
+TFile* FindOpenRootFile(const char *fname)
+{
+    if (!fname || !fname[0] || !gROOT || !gROOT->GetListOfFiles()) {
+        return 0;
+    }
+
+    // First try ROOT's exact-name lookup.
+    TObject *exact = gROOT->GetListOfFiles()->FindObject(fname);
+    if (exact && exact->InheritsFrom("TFile")) {
+        TFile *file = (TFile*)exact;
+        if (file->IsOpen()) return file;
+    }
+
+    // Fall back to comparing both full names and basenames.  This handles
+    // relative-vs-absolute path differences without opening a second copy of
+    // the output file.
+    const TString targetName(fname);
+    const TString targetBase(gSystem->BaseName(fname));
+
+    TIter nextFile(gROOT->GetListOfFiles());
+    TObject *obj = 0;
+
+    while ((obj = nextFile())) {
+        if (!obj->InheritsFrom("TFile")) continue;
+
+        TFile *file = (TFile*)obj;
+        if (!file->IsOpen()) continue;
+
+        const TString openName(file->GetName());
+        const TString openBase(gSystem->BaseName(openName.Data()));
+
+        if (openName == targetName || openBase == targetBase) {
+            return file;
+        }
+    }
+
+    return 0;
+}
+
+//-----------------------------------------------------------------------------
+Bool_t RestorePrimaryOutputDirectory(const char *fname)
+{
+    TFile *outputFile = FindOpenRootFile(fname);
+
+    if (!outputFile) {
+        cout << "WARNING: Could not find open StarPrimaryMaker ROOT output file: "
+             << fname << endl;
+        cout << "WARNING: Final StarGenStats write may still fail if gDirectory "
+             << "is not associated with a file." << endl;
+        return kFALSE;
+    }
+
+    if (!outputFile->cd()) {
+        cout << "WARNING: Failed to cd() to StarPrimaryMaker ROOT output file: "
+             << outputFile->GetName() << endl;
+        return kFALSE;
+    }
+
+    cout << "Restored ROOT output directory for finalization: "
+         << gDirectory->GetPath() << endl;
 
     return kTRUE;
 }
@@ -470,7 +541,7 @@ void trig(Int_t n=1)
         chain->Clear();
 
         // Read the same entry index from MoreTags and PYTHIA.
-        // This is the event-by-event synchronization used for Stage 2B.
+        // This is the event-by-event synchronization established in Stage 2B.
         if (!ReadMoreTagsEntry(entry)) {
             cout << "ERROR: Failed to read MoreTags entry " << entry << endl;
             break;
@@ -700,7 +771,7 @@ void starsim(Int_t nevents = 1,
     TString DBV;
     DBV.Form("dbv%i", (Int_t)gTagProdTime);
 
-    cout << "STARSIM Stage 2B configuration:" << endl
+    cout << "STARSIM Stage 2C configuration:" << endl
          << "  events          = " << nevents << endl
          << "  PYTHIA input    = " << pythiaInput << endl
          << "  MoreTags input  = " << moreTagsInput << endl
@@ -718,17 +789,21 @@ void starsim(Int_t nevents = 1,
          << "  DBV             = " << DBV.Data() << endl;
 
     // ------------------------------------------------------------------------
-    // Build the same Stage 2A chain, now with SDT/DBV dates taken from the
-    // first MoreTags entry. Keep y2014a and the existing chain options unchanged
-    // so Stage 2B isolates event matching/metadata rather than changing geometry.
+    // Stage 2C: match the official Run14 embedding simulation configuration.
+    // Keep the Stage 2B event matching, MoreTags metadata and timestamp behavior,
+    // but switch the geometry/chain setup to runEmbeddingSimulation2014.C.
+    const TString geometryTag = "y2014x";
+
     gROOT->ProcessLine(".L bfc.C");
     {
-        TString simple = "y2014a ";
+        TString simple = geometryTag;
+        simple += " ";
         simple += SDT;
         simple += " ";
         simple += DBV;
-        simple += " geant gstar usexgeom agml ";
+        simple += " geant gstar usexgeom agml misalign newtpcalignment bigbig ";
 
+        cout << "  geometry tag    = " << geometryTag.Data() << endl;
         cout << "  BFC options     = " << simple.Data() << endl;
         bfc(0, simple);
     }
@@ -746,7 +821,9 @@ void starsim(Int_t nevents = 1,
     gSystem->Load("Pythia8_3_03.so");
 
     TString geometryCommand;
-    geometryCommand.Form("field=%.9f y2014a", gGeometryMagField);
+    geometryCommand.Form("field=%.9f %s",
+                         gGeometryMagField,
+                         geometryTag.Data());
     geometry(geometryCommand);
 
     // Keep the Stage 2A random-number treatment unchanged for now.
@@ -837,11 +914,20 @@ void starsim(Int_t nevents = 1,
 
     command("call agexit");
 
+    // Close only the read-only inputs first.  Geometry/misalignment setup can
+    // leave gDirectory pointing at ROOT's top-level Rint directory.  Restore
+    // the still-open StarPrimaryMaker output file afterwards so its final
+    // StarGenStats bookkeeping object is written to a real file at shutdown.
     CloseInputFiles();
+    const Bool_t outputDirectoryRestored =
+        RestorePrimaryOutputDirectory(starsimRootOutput);
 
-    cout << "STARSIM Stage 2B finished." << endl
+    cout << "STARSIM Stage 2C v2 finished." << endl
          << "  ROOT output = " << starsimRootOutput << endl
-         << "  FZD output  = " << fzdOutput << endl;
+         << "  FZD output  = " << fzdOutput << endl
+         << "  output dir  = "
+         << (outputDirectoryRestored ? "restored" : "NOT restored")
+         << endl;
 }
 // ----------------------------------------------------------------------------
 
