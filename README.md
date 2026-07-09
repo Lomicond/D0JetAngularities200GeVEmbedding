@@ -87,6 +87,14 @@ For the authoritative and up-to-date selection logic, always check
 src/pythia/make_d0_pythia8.cc
 ```
 
+## Running the full workflow
+
+To run the complete workflow:
+
+```bash
+chmod +x run_all.sh
+./run_all.sh
+
 ---
 
 # Building the standalone PYTHIA8 generator
