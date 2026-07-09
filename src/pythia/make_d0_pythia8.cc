@@ -28,7 +28,9 @@ int main(int argc, char* argv[])
 
     //const double eCM = 200.0;        // GeV
     const double d0PtMin = 1.0;      // GeV/c
-    const double d0PtMax = 10.0;     // GeV/c
+    const double d0PtMax = 25.0;     // GeV/c
+    
+    const double particleEtaMax = 3;
     
     const double d0YMax = 1;
 
@@ -202,6 +204,7 @@ int main(int argc, char* argv[])
     // ------------------------------------------------------------
     // First: find a D0 / anti-D0 in requested pT range
     // ------------------------------------------------------------
+    
     bool hasGoodD0 = false;
 
     for (int i = 0; i < pythia.event.size(); ++i) {
@@ -212,7 +215,8 @@ int main(int argc, char* argv[])
         if (p.pT() <= d0PtMin || p.pT() >= d0PtMax) continue;
         
         if (std::abs(p.y()) >= d0YMax) continue;
-
+        if (std::abs(p.eta()) >= particleEtaMax) continue;
+        
         hasGoodD0 = true;
 
         d0_index = i;       // index in full PYTHIA event record
@@ -228,7 +232,44 @@ int main(int argc, char* argv[])
     }
 
     if (!hasGoodD0) continue;
+    
+    /*
+    bool hasD0 = false;
+    bool allD0Accepted = true;
 
+    for (int i = 0; i < pythia.event.size(); ++i) {
+
+        const Pythia8::Particle &p = pythia.event[i];
+
+        // D0 or anti-D0
+        if (std::abs(p.id()) != 421)
+            continue;
+
+        hasD0 = true;
+
+        d0_index = i;       // index in full PYTHIA event record
+        d0_id    = p.id();
+        d0_pt    = p.pT();
+        d0_eta   = p.eta();
+        d0_y     = p.y();
+        d0_phi   = p.phi();
+        d0_m     = p.m();
+        d0_e     = p.e();
+
+        // Reject the whole event if ANY D0 fails ANY condition
+        if (d0_pt < d0PtMin ||
+            d0_pt > d0PtMax ||
+            std::abs(d0_y) > d0YMax ||
+            std::abs(d0_eta) > particleEtaMax) {
+
+            allD0Accepted = false;
+            break;
+        }
+    }
+
+    if (!hasD0 || !allD0Accepted)
+        continue;
+*/
     // ------------------------------------------------------------
     // Second: store final-state particles for this accepted event
     // ------------------------------------------------------------
@@ -241,6 +282,8 @@ int main(int argc, char* argv[])
 
         // Usually not useful for detector embedding
         if (absId == 12 || absId == 14 || absId == 16) continue;
+        
+        if (std::abs(p.eta()) >= particleEtaMax) continue;
 
         part_pythiaIndex.push_back(i);
 
