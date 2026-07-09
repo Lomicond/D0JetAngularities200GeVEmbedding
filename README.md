@@ -94,6 +94,7 @@ To run the complete workflow:
 ```bash
 chmod +x run_all.sh
 ./run_all.sh
+```
 
 ---
 
