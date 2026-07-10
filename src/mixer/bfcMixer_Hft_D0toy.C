@@ -57,10 +57,12 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
   if (prodName == "P16idAuAu200hft"){ 
     chain2Opt += geomP16id; // done in analogy to P16ijAuAu200hft... need to understand "little hack" above...
     chain3Opt += prodP16idAuAu200hft; // nix chain3Opt += " btofSim -vpdSim btofMixer ";
+    chain3Opt += " btofSim -vpdSim btofMixer "; //added
   }
   else if (prodName == "P16idAuAu200hftZB"){ 
     chain2Opt += geomP16id; // done in analogy to P16ijAuAu200hft... need to understand "little hack" above...
     chain3Opt += prodP16idAuAu200hftZB; // nix chain3Opt += " btofSim -vpdSim btofMixer ";
+    chain3Opt += " btofSim -vpdSim btofMixer "; //added
   }
   else if (prodName == "P16ijAuAu200hft" ) {
       chain2Opt += geomP16ij;
