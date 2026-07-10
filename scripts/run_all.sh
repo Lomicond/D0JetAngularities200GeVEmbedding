@@ -1010,6 +1010,22 @@ stage_pico() {
 
     cat >> "$csh" <<EOF
 
+# Prefer locally built STAR libraries after starver configured the release.
+set local_star_lib = "${ROOT_DIR}/.\$STAR_HOST_SYS/lib"
+
+if ( -d "\$local_star_lib" ) then
+    if ( \$?LD_LIBRARY_PATH ) then
+        setenv LD_LIBRARY_PATH "\${local_star_lib}:\${LD_LIBRARY_PATH}"
+    else
+        setenv LD_LIBRARY_PATH "\${local_star_lib}"
+    endif
+else
+    echo "ERROR: Local STAR library directory not found: \$local_star_lib"
+    exit 2
+endif
+
+echo "D0WF_LOCAL_STAR_LIB=\$local_star_lib"
+
 mkdir -p "${PICO_DIR}"
 rm -f "${PICO_OUTPUT}"
 
