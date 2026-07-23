@@ -87,20 +87,28 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
   }
   chain3Opt += ",TpcMixer,GeantOut,MiniMcMk,McAna,-in,NoInput,useInTracker"; 
   chain3Opt += ",mcevout"; 
+  //chain3Opt += ",TpcMixer,GeantOut,MiniMcMk,McAna,-in,NoInput,useInTracker,emcSim,BEmcMixer,EEfs,EEmcMixer";
+  //chain3Opt += ",mcevout";
 
   // Dynamically link some shared libs
   gROOT->LoadMacro("bfc.C");
-  if (gClassTable->GetID("StBFChain") < 0) Load();
+  cout << "D0WF_MIXER_CALL_BFC_LOAD" << endl;
+  Load();
+  cout << "D0WF_MIXER_AFTER_BFC_LOAD" << endl;
   //______________Create the main chain object______________________________________
   Chain = new StChain("Embedding");
   //________________________________________________________________________________
+  cout << "D0WF_MIXER_BEFORE_BFC1 chain1Opt=[" << chain1Opt << "] daqfile=[" << daqfile << "]" << endl;
   bfc(-1,chain1Opt,daqfile);
+  cout << "D0WF_MIXER_AFTER_BFC1" << endl;
   chain1 = chain;
   chain1->SetName("One"); 
   Chain->cd();
   //________________________________________________________________________________  
   if(bPythia){
+    cout << "D0WF_MIXER_BEFORE_BFC2 chain2Opt=[" << chain2Opt << "] fzdfile=[" << fzdfile << "]" << endl;
     bfc(-1,chain2Opt,fzdfile);
+    cout << "D0WF_MIXER_AFTER_BFC2" << endl;
   	chain2 = chain;
   	chain2->SetName("Two"); 
   	St_geant_Maker *geantMk = (St_geant_Maker*) chain2->GetMaker("geant");
@@ -149,7 +157,10 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
     //  OutputFileName.Append("_emb.root");
     OutputFileName.Append(".root");
   }
+
+  cout << "D0WF_MIXER_BEFORE_BFC3 chain3Opt=[" << chain3Opt << "] output=[" << OutputFileName << "]" << endl;
   bfc(-1,chain3Opt,0,OutputFileName);
+  cout << "D0WF_MIXER_AFTER_BFC3" << endl;
   chain3 = chain;
   chain3->SetName("Three"); 
   Chain->cd();
@@ -190,17 +201,46 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
 
  //............. begin of EMC embedding makers................
 
+   //.............. Diagnostic: no BEMC signal mixing ....................
+  // Keep StMcEventMaker, but do not run StEmcSimulatorMaker/StEmcMixerMaker.
+  // This tests whether the old BTowHit values are closer to real-data-only BEMC.
+/*
+  gSystem->Load("StMcEventMaker");
+
+  StMcEventMaker* mcEventMaker = new StMcEventMaker();
+  chain3->AddAfter("emcRaw", mcEventMaker);
+
+  cout << "D0WF_BEMC_SIGNAL_MIXING=0_KEEP_MC_EVENT=1" << endl;
+  */
+
   //.............. Add BEmc stuff here ....................
-  gSystem->Load("StEmcSimulatorMaker");
-  gSystem->Load("StEmcMixerMaker");
-  gSystem->Load("StEEmcSimulatorMaker");
+  
+  gSystem->Load("StEmcSimulatorMaker"); //test
+  gSystem->Load("StEmcMixerMaker"); //test
+  gSystem->Load("StEEmcSimulatorMaker"); //test
 
   StMcEventMaker* mcEventMaker = new StMcEventMaker();
   StEmcSimulatorMaker *bemcSim   = new StEmcSimulatorMaker();
+
+  //----------test-----------------
+  bemcSim->setCalibSpread(kBarrelEmcTowerId,0.15);
+  bemcSim->setCheckStatus(kBarrelEmcTowerId,false);
+  bemcSim->setMakeFullDetector(kBarrelEmcTowerId,true);
+  bemcSim->setDoZeroSuppression(kBarrelEmcTowerId,false);
+
+  cout << "D0WF_BEMC_SIM_ALT_SETTINGS=1 "
+      << "calibSpread=0.15 "
+      << "checkStatus=0 "
+      << "makeFullDetector=1 "
+      << "zeroSuppression=0"
+      << endl;
+//---------------------------------
+
   StEmcMixerMaker     *bemcMixer = new StEmcMixerMaker();
   chain3->AddAfter("emcRaw",bemcMixer); 
   chain3->AddAfter("emcRaw",bemcSim); 
   chain3->AddAfter("emcRaw",mcEventMaker);
+  
   bemcMixer->SetDebug(0); // set it to 1 for more printouts
  // note, Barrel slow sim is always ON, said Adam 
 
@@ -211,6 +251,7 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
   /* position B+E EMC makers in the chain 
      (order is reverse because 'After' is used - looks funny but is right)
   */
+ 
   chain3->AddAfter("emcRaw",eemcMixer); 
   chain3->AddAfter("emcRaw",eemcFastSim); 
 

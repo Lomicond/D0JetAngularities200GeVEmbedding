@@ -794,6 +794,13 @@ void starsim(Int_t nevents = 1,
     // but switch the geometry/chain setup to runEmbeddingSimulation2014.C.
     const TString geometryTag = "y2014x";
 
+  gSystem->Load("St_base");
+  gSystem->Load("St_Tables");
+  gSystem->Load("StChain");
+  gSystem->Load("St_g2t");
+
+  gSystem->Exec("echo PROC_EXE_FROM_MACRO=`readlink -f /proc/$PPID/exe`");
+  
     gROOT->ProcessLine(".L bfc.C");
     {
         TString simple = geometryTag;
@@ -805,7 +812,8 @@ void starsim(Int_t nevents = 1,
 
         cout << "  geometry tag    = " << geometryTag.Data() << endl;
         cout << "  BFC options     = " << simple.Data() << endl;
-        bfc(0, simple);
+        
+	bfc(0, simple);
     }
 
     gSystem->Load("libVMC.so");
@@ -834,7 +842,11 @@ void starsim(Int_t nevents = 1,
     chain->AddBefore("geant", _primary);
 
     Kinematics();
-    SetupD0Decay();
+    if (gSystem->Getenv("D0WF_DISABLE_FORCED_D0_DECAY")) {
+        cout << "D0WF_DISABLE_FORCED_D0_DECAY is set: skipping SetupD0Decay()" << endl;
+    } else {
+        SetupD0Decay();
+    }
 
     _primary->Init();
 

@@ -163,12 +163,17 @@ void makePicoDstFromMuDst(
     StEpcMaker *epc = new StEpcMaker();
     epc->setPrint(kFALSE);
 
+#if 0
+    // D0WF disabled whole StTriggerSimuMaker block.
+    // BEMC hit reconstruction above stays enabled.
+    // This avoids StTriggerSimuMaker/EEMC DSM threshold crashes in SL16d_embed2 hybrid Pico stage.
     StTriggerSimuMaker *trigSimu = new StTriggerSimuMaker();
     trigSimu->setMC(false);
     trigSimu->useBemc();
-    trigSimu->useEemc();
+    // D0WF disabled: trigSimu->useEemc();
     trigSimu->useOfflineDB();
     trigSimu->bemc->setConfig(StBemcTriggerSimu::kOffline);
+#endif
 
     StMagFMaker *magFMaker = new StMagFMaker();
 
