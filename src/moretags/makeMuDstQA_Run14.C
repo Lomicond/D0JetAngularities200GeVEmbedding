@@ -35,7 +35,7 @@ void makeMuDstQA_Run14(TString InputFileList, Int_t nFiles, Int_t nEvents, TStri
  
   // Load libraries for CINT mode
 #ifdef __CINT__
-  gROOT   -> Macro("loadMuDst.C");
+  gROOT->Macro("/gpfs/mnt/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/loadMuDst_SL16d_local64_min.C");
 #endif
 
   // Ensure the output directory exists.

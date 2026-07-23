@@ -45,3 +45,85 @@ paw.metafile
 *.swp
 *.swo
 .DS_Store
+
+# D0 embedding debug / generated files
+.sl73_x8664_gcc485/
+cleanup_*/
+work/
+
+# ROOT/CINT generated files
+AutoDict_*
+*_C.d
+*_C.so
+*.pcm
+*.d
+*.so
+
+# ROOT outputs and STAR runtime outputs
+*.root
+*.fzd
+fort.*
+gphysi.dat
+paw.metafile
+
+# temporary/debug files from embedding bring-up
+local_root4star_patch/
+local_root4star_53430_patch/
+local_sl16d_bin/
+sl16d2_D0decay_overlay/
+sl16d2_D0decay_overlay.tar.gz
+forensics/
+
+# accidental shell/test artifacts
+1
+Connection
+CONSTRUCT:
+git
+_idTruth
+_qaTruth
+mIdTruth
+mQaTruth
+qaTruth
+moretags
+pico
+
+# D0 embedding debug / generated files
+.sl73_x8664_gcc485/
+cleanup_*/
+work/
+
+# ROOT/CINT generated files
+AutoDict_*
+*_C.d
+*_C.so
+*.pcm
+*.d
+*.so
+
+# ROOT outputs and STAR runtime outputs
+*.root
+*.fzd
+fort.*
+gphysi.dat
+paw.metafile
+
+# temporary/debug files from embedding bring-up
+local_root4star_patch/
+local_root4star_53430_patch/
+local_sl16d_bin/
+sl16d2_D0decay_overlay/
+sl16d2_D0decay_overlay.tar.gz
+forensics/
+
+# accidental shell/test artifacts
+1
+Connection
+CONSTRUCT:
+git
+_idTruth
+_qaTruth
+mIdTruth
+mQaTruth
+qaTruth
+moretags
+pico
