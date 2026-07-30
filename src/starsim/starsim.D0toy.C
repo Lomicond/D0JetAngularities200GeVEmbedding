@@ -385,19 +385,23 @@ const char* ParticleNameFromPdg(Int_t pdg)
 {
     switch (pdg) {
         // photons
-        case   22: return "gamma";
+        case    22: return "gamma";
 
         // leptons
-        case   11: return "e-";
-        case  -11: return "e+";
-        case   13: return "mu-";
-        case  -13: return "mu+";
+        case    11: return "e-";
+        case   -11: return "e+";
+        case    13: return "mu-";
+        case   -13: return "mu+";
 
-        // light charged hadrons
-        case  211: return "pi+";
-        case -211: return "pi-";
-        case  321: return "K+";
-        case -321: return "K-";
+        // light mesons
+        case   111: return "pi0";
+        case   211: return "pi+";
+        case  -211: return "pi-";
+        case   221: return "eta";
+        case   321: return "K+";
+        case  -321: return "K-";
+        case   130: return "K_L0";
+        case   310: return "K_S0";
 
         // baryons
         case  2212: return "proton";
@@ -405,15 +409,28 @@ const char* ParticleNameFromPdg(Int_t pdg)
         case  2112: return "neutron";
         case -2112: return "antineutron";
 
-        // neutral strange hadrons
-        case  130: return "K_L0";
-        case  310: return "K_S0";
-        case  3122: return "Lambda0";
-        case -3122: return "Lambda0_bar";
+        // strange baryons
+        case  3122: return "Lambda";
+        case -3122: return "anti_Lambda";
+
+        case  3112: return "Sigma-";
+        case -3112: return "anti_Sigma+";
+        case  3222: return "Sigma+";
+        case -3222: return "anti_Sigma-";
+        case  3212: return "Sigma0";
+        case -3212: return "anti_Sigma0";
+
+        case  3312: return "Xi-";
+        case -3312: return "anti_Xi+";
+        case  3322: return "Xi0";
+        case -3322: return "anti_Xi0";
+
+        case  3334: return "Omega-";
+        case -3334: return "anti_Omega+";
 
         // charm
-        case  421: return "D0";
-        case -421: return "D0_bar";
+        case   421: return "D0";
+        case  -421: return "D0_bar";
 
         default: return "";
     }

@@ -219,13 +219,13 @@ set TEMPLATE_PYTHIA_SOURCE = \
 "$SIM_TEMPLATE/pythia/make_d0_pythia8.cc"
 
 set TEMPLATE_PYTHIA_CONFIG = \
-"$SIM_TEMPLATE/pythia/pythia8_reference_effective.cmnd"
+"$SIM_TEMPLATE/pythia/pythia8_detroit_v1.cmnd"
 
 set PYTHIA_SOURCE = \
 "$PYTHIADIR/make_d0_pythia8.cc"
 
 set PYTHIA_CONFIG = \
-"$PYTHIADIR/pythia8_reference_effective.cmnd"
+"$PYTHIADIR/pythia8_detroit_v1.cmnd"
 
 if ( ! -s "$TEMPLATE_PYTHIA_SOURCE" ) then
     echo "ERROR: frozen PYTHIA source is missing:"

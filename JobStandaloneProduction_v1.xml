@@ -34,8 +34,8 @@
     cp "${FILELIST}" "${BASEJOB}/mudst.selected.list"
 
     cp scripts/run_standalone_production_v3.csh run_standalone_production_batch.csh
-    sed -i 's|${NEVENTS}evts_simulation_v1|${NEVENTS}evts_simulation_batch|g' run_standalone_production_batch.csh
-    sed -i 's|${NEVENTS}evts_standalone_v1|${NEVENTS}evts_standalone_batch|g' run_standalone_production_batch.csh
+    sed -i "s|${NEVENTS}evts_simulation_v1|${NEVENTS}evts_simulation_batch|g" run_standalone_production_batch.csh
+    sed -i "s|${NEVENTS}evts_standalone_v1|${NEVENTS}evts_standalone_batch|g" run_standalone_production_batch.csh
 
     set RUNLOG = "${PROJECT}/log/D0Standalone_${NEVENTS}evts_${JOBID}_${JOBINDEX}.log"
 
@@ -70,6 +70,8 @@
       <File>file:./src/pico/</File>
 
       <File>file:./external/pythia8_303/</File>
+      <File>file:./scripts/setup_SL16d2_D0Embedding_hybrid_v3.csh</File>
+      <File>file:./src/standalone/</File>
 
       <File>file:./local_SL16d_embed2_facade/.sl73_x8664_gcc485/</File>
       <File>file:./local_sl16d_bin/</File>

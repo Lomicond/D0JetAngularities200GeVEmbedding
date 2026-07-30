@@ -326,11 +326,11 @@ if ( ! mMuEvent->triggerIdCollection().nominal().isTrigger(450050) &&
      if ( fabs(mMuEvent->primaryVertexPosition().z()) > 6.0 ) continue ;
      if ( fabs(mMuEvent->primaryVertexPosition().z() - vzVpd) > 3.0 ) continue ;
      //Vr
-     //if ( mMuEvent->primaryVertexPosition().perp() > 2.0 ) continue ;
+     if ( mMuEvent->primaryVertexPosition().perp() > 2.0 ) continue ;
      //pileup cut
      //if ( mnTofMatch <= 0.46*mnRefMult - 10 ) continue ;
      //VF failed (for some old dataset)
-     //if ( fabs(mMuEvent->primaryVertexPosition().x()) < 1e-5 && fabs(mMuEvent->primaryVertexPosition().y()) < 1e-5 && fabs(mMuEvent->primaryVertexPosition().z()) < 1e-5 ) continue;
+     if ( fabs(mMuEvent->primaryVertexPosition().x()) < 1e-5 && fabs(mMuEvent->primaryVertexPosition().y()) < 1e-5 && fabs(mMuEvent->primaryVertexPosition().z()) < 1e-5 ) continue;
 
      chop_output<<mRunId<<'\t'<<mEvtId<<endl;
 

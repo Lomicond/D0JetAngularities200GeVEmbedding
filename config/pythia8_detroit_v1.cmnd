@@ -1,0 +1,31 @@
+# ============================================================
+# PYTHIA 8.303 Detroit tune
+#
+# Baseline:
+#   Monash 2013 ee and pp settings
+#
+# Detroit overrides:
+#   M. R. Aguilar et al.,
+#   Phys. Rev. D 105, 016011 (2022)
+#   DOI: 10.1103/PhysRevD.105.016011
+# ============================================================
+
+# Explicit Monash baseline used by the Detroit tuning study.
+Tune:ee = 7
+Tune:pp = 14
+
+# Detroit PDF and proton-overlap configuration.
+PDF:pSet = 17
+MultipartonInteractions:bProfile = 2
+MultipartonInteractions:ecmRef = 200.
+
+# Detroit tuned parameters.
+MultipartonInteractions:pT0Ref = 1.40
+MultipartonInteractions:ecmPow = 0.135
+MultipartonInteractions:coreRadius = 0.56
+MultipartonInteractions:coreFraction = 0.78
+ColourReconnection:range = 5.4
+
+# Print the effective configuration during initialization.
+Init:showChangedSettings = on
+Init:showChangedParticleData = off
