@@ -1,6 +1,6 @@
 #!/bin/tcsh -f
 #
-# run_standalone_production_v1.csh
+# run_standalone_production_v3.csh
 #
 # Standalone D0 MC chain:
 #
@@ -13,7 +13,7 @@
 #
 # Default test:
 #
-#   tcsh scripts/run_standalone_production_v1.csh
+#   tcsh scripts/run_standalone_production_v3.csh
 #
 # Arguments:
 #
@@ -25,13 +25,13 @@
 # Examples:
 #
 #   Fresh 5-event run:
-#       tcsh scripts/run_standalone_production_v1.csh 5 1 0
+#       tcsh scripts/run_standalone_production_v3.csh 5 1 0
 #
 #   Resume from STARSIM:
-#       tcsh scripts/run_standalone_production_v1.csh 5 4 0
+#       tcsh scripts/run_standalone_production_v3.csh 5 4 0
 #
 #   Force only PicoDst:
-#       tcsh scripts/run_standalone_production_v1.csh 5 6 1
+#       tcsh scripts/run_standalone_production_v3.csh 5 6 1
 #
 
 umask 002
@@ -166,7 +166,7 @@ mkdir -p "$STANDJOB/snapshots"
 set RUN_TAG = `date +%Y%m%d_%H%M%S`
 
 set LOGDIR = \
-"$STANDJOB/logs/run_standalone_production_v1_$RUN_TAG"
+"$STANDJOB/logs/run_standalone_production_v3_$RUN_TAG"
 
 mkdir -p "$LOGDIR"
 
@@ -253,7 +253,7 @@ set STAGE04_DRIVER = \
 "$SIMDRIVERS/04_starsim.csh"
 
 set STAGE05_DRIVER = \
-"$STANDDRIVERS/05_standalone_reco.csh"
+"$STANDDRIVERS/05_standalone_reco_v3.csh"
 
 set STAGE06_DRIVER = \
 "$STANDDRIVERS/06_pico.csh"
@@ -276,7 +276,7 @@ sed \
     -e "s|@SIMJOB@|$SIMJOB|g" \
     -e "s|@STANDJOB@|$STANDJOB|g" \
     -e "s|@NEVENTS@|$NEVENTS|g" \
-    "$STAND_TEMPLATE/drivers/05_standalone_reco.csh" \
+    "$STAND_TEMPLATE/drivers/05_standalone_reco_v3.csh" \
     >! "$STAGE05_DRIVER"
 
 sed \
@@ -387,7 +387,7 @@ set PICO_OUTPUT = \
 # ============================================================================
 
 echo "============================================================"
-echo "Standalone production v1"
+echo "Standalone production v3"
 echo "============================================================"
 echo "Events          : $NEVENTS"
 echo "PYTHIA seed     : $PYTHIA_SEED"
@@ -826,10 +826,10 @@ if ( $START_STAGE <= 5 ) then
             echo
             tail -120 "$LOGDIR/05_standalone_reco.log"
 
-            if ( -f "$STANDJOB/logs/05_standalone_reco_v1.root4star.log" ) then
+            if ( -f "$STANDJOB/logs/05_standalone_reco_v3.root4star.log" ) then
                 echo
                 tail -120 \
-"$STANDJOB/logs/05_standalone_reco_v1.root4star.log"
+"$STANDJOB/logs/05_standalone_reco_v3.root4star.log"
             endif
 
             exit 51

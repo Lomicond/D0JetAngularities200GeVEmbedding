@@ -455,3 +455,19 @@ Before large-scale production, validate
 - reconstructed distributions,
 - consistency of the full chain with the reference STAR production.
 
+
+## Local runtime dependencies
+
+The following runtime components are intentionally not stored in Git:
+
+- `external/pythia8_303/`
+- `.sl73_x8664_gcc485/`
+- `local_SL16d_embed2_facade/`
+- `local_sl16d_bin/`
+-- `.sl73_x8664_gcc485/`
+- `local_SL16d `sl16d2_D0decay_overlay/`
+
+The standalone workflow was validated with:
+
+```text
+scripts/run_standalone_production_v3.csh

@@ -33,7 +33,7 @@
 
     cp "${FILELIST}" "${BASEJOB}/mudst.selected.list"
 
-    cp scripts/run_standalone_production_v1.csh run_standalone_production_batch.csh
+    cp scripts/run_standalone_production_v3.csh run_standalone_production_batch.csh
     sed -i 's|${NEVENTS}evts_simulation_v1|${NEVENTS}evts_simulation_batch|g' run_standalone_production_batch.csh
     sed -i 's|${NEVENTS}evts_standalone_v1|${NEVENTS}evts_standalone_batch|g' run_standalone_production_batch.csh
 
@@ -60,7 +60,7 @@
 
   <SandBox installer="ZIP">
     <Package name="D0Standalone">
-      <File>file:./scripts/run_standalone_production_v1.csh</File>
+      <File>file:./scripts/run_standalone_production_v3.csh</File>
       <File>file:./scripts/checkRootTree_v1.C</File>
       <File>file:./scripts/setup_SL16d2_D0Embedding_hybrid.csh</File>
       <File>file:./loadMuDstLibraries_SL16d.C</File>
