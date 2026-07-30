@@ -1,0 +1,19 @@
+! Effective runtime settings measured from the reference
+! StarPythia8 / PYTHIA 8.303 configuration.
+!
+! Default fixed settings from Table I combined with
+! the five fitted parameters usually associated with the Detroit tune.
+
+Tune:pp = 14
+
+PDF:pSet = 13
+MultipartonInteractions:ecmRef = 7000
+MultipartonInteractions:bProfile = 3
+
+MultipartonInteractions:pT0Ref = 1.40
+MultipartonInteractions:ecmPow = 0.135
+MultipartonInteractions:coreRadius = 0.56
+MultipartonInteractions:coreFraction = 0.78
+MultipartonInteractions:expPow = 1.85
+
+ColourReconnection:range = 5.4

@@ -29,7 +29,7 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
   //  TString prodP15icAuAu200hft ( "DbV20150316 P2014a PxlHit IstHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt  -vfminuit vfmce tpxclu pxlslowsim istslowsim nosvtit nossdit picoWrite PicoVtxDefault"); // pxlslowsim istslowsi  //                             DbV20150316 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
   TString prodP16idAuAu200hft  ( "DbV20160418 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D ODistoSmear -hitfilt -vfminuit vfmce tpxclu pxlslowsim istslowsim nosvtit nossdit" ); // picoWrite PicoVtxDefault            DbV20150316 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
   //TString prodP16idAuAu200hft  ( "DbV20160418 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D ODistoSmear -hitfilt  -vfminuit vfmce tpxclu pxlslowsim istslowsim nosvtit nossdit" ); // picoWrite PicoVtxDefault            DbV20150316 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
-  TString prodP16idAuAu200hftZB( "DbV20160418 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D ODistoSmear -hitfilt  vfminuit -vfmce tpxclu pxlslowsim istslowsim nosvtit nossdit" ); // picoWrite PicoVtxDefault            DbV20150316 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
+  TString prodP16idAuAu200hftZB( "DbV20160418 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D ODistoSmear -hitfilt  vfmce tpxclu pxlslowsim istslowsim nosvtit nossdit btofit" ); // picoWrite PicoVtxDefault            DbV20150316 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
   //$$$TString prodP15icAuAu200hft ( "DbV20150316 P2014a PxlHit IstHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt  -vfminuit vfmce tpxclu pxlslowsim istslowsim nosvtit nossdit "); // pxlslowsim istslowsi  //                             DbV20150316 P2014a pxlHit istHit btof mtd mtdCalib BEmcChkStat CorrX OSpaceZ2 OGridLeak3D -hitfilt
 
   // Run 16 AuAu200 HFT chain
@@ -223,8 +223,8 @@ void bfcMixer_Hft(Int_t Nevents=1  ,
   StEmcSimulatorMaker *bemcSim   = new StEmcSimulatorMaker();
 
   //----------test-----------------
-  bemcSim->setCalibSpread(kBarrelEmcTowerId,0.15);
-  bemcSim->setCheckStatus(kBarrelEmcTowerId,false);
+  bemcSim->setCalibSpread(kBarrelEmcTowerId,0.0);
+  bemcSim->setCheckStatus(kBarrelEmcTowerId,true);
   bemcSim->setMakeFullDetector(kBarrelEmcTowerId,true);
   bemcSim->setDoZeroSuppression(kBarrelEmcTowerId,false);
 

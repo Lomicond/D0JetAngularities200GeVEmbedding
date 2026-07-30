@@ -131,7 +131,6 @@ void makePicoDstFromMuDst(
     muDstMaker->SetStatus("CovGlobTrack", 1);
     muDstMaker->SetStatus("BTof*", 1);
     muDstMaker->SetStatus("Emc*", 1);
-    muDstMaker->SetStatus("EEmc*", 1);
     muDstMaker->SetStatus("MTD*", 1);
 
     // Preserve embedding MC truth in the output PicoDst.
@@ -166,22 +165,22 @@ void makePicoDstFromMuDst(
     StEpcMaker *epc = new StEpcMaker();
     epc->setPrint(kFALSE);
 
-#if 1
+#if 0
     // D0WF disabled whole StTriggerSimuMaker block.
     // BEMC hit reconstruction above stays enabled.
     // This avoids StTriggerSimuMaker/EEMC DSM threshold crashes in SL16d_embed2 hybrid Pico stage.
     StTriggerSimuMaker *trigSimu = new StTriggerSimuMaker();
     trigSimu->setMC(false);
     trigSimu->useBemc();
-    trigSimu->useEemc();
+    // D0WF disabled: trigSimu->useEemc();
     trigSimu->useOfflineDB();
     trigSimu->bemc->setConfig(StBemcTriggerSimu::kOffline);
 #endif
 
-// D0WF_DISABLED_MTD:     StMagFMaker *magFMaker = new StMagFMaker();
-// D0WF_DISABLED_MTD: 
-// D0WF_DISABLED_MTD:     StMtdMatchMaker *mtdMatchMaker = new StMtdMatchMaker();
-// D0WF_DISABLED_MTD:     StMtdCalibMaker *mtdCalibMaker = new StMtdCalibMaker("mtdcalib");
+    StMagFMaker *magFMaker = new StMagFMaker();
+
+    StMtdMatchMaker *mtdMatchMaker = new StMtdMatchMaker();
+    StMtdCalibMaker *mtdCalibMaker = new StMtdCalibMaker("mtdcalib");
 
     // StPicoDstMaker derives its output name from the string passed here.
     // Pass only the MuDst basename, not the absolute path: the maker searches
@@ -213,7 +212,7 @@ void makePicoDstFromMuDst(
 
     // STAR's public conversion macro constructs AgML geometry after Init().
     // For this Run14 workflow use the production-level Run14 tag.
-    // D0WF: no Pico-stage geometry, matching the reference standalone PicoDst configuration.
+    loadPicoDstAgML_Run14(geometryTag);
 
     Int_t processed = 0;
     Int_t errors = 0;

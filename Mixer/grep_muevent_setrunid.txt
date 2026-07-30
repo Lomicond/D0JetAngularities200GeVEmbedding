@@ -1,1 +1,0 @@
-/star/nfs4/AFS/star/packages/pro/StRoot/StMuDSTMaker/COMMON/StAddRunInfoMaker.cxx:32:      pRunInfo->setRunId( eventInfo->runId() );

@@ -5,125 +5,105 @@
 *.fzd
 *.daq
 
+fort.*
+gphysi.dat
+paw.metafile
+
+# Crash dumps
+core
+core.*
+*.core
+
+
 # ============================================================
-# Logs and runtime outputs
+# Logs and generated reports
 # ============================================================
 *.log
-logs/*
+
+csh/*
+err/*
+list/*
+log/*
+out/*
+report/*
+production/*
+
+# Keep the empty runtime directories in Git
+!csh/.gitkeep
+!err/.gitkeep
+!list/.gitkeep
+!log/.gitkeep
+!out/.gitkeep
+!report/.gitkeep
+!production/.gitkeep
+
+
+# ============================================================
+# Generated working directories
+# ============================================================
 work/*
-output/*
 
-# Keep empty runtime directories in Git
-!logs/.gitkeep
+# Keep only the work-directory placeholder
 !work/.gitkeep
-!output/.gitkeep
+
 
 # ============================================================
-# Local large inputs
+# Local STAR compatibility environments and libraries
 # ============================================================
-input/daq/*
-input/mudst/*
+.sl73_x8664_gcc485/
+local_SL16d_embed2_facade/
+local_sl16d_bin/
+sl16d2_D0decay_overlay/
 
-!input/daq/.gitkeep
-!input/mudst/.gitkeep
 
 # ============================================================
-# ROOT / ACLiC temporary files
+# Bundled external runtime dependencies
 # ============================================================
+# Pythia 8.303 is required locally and is packed by the SUMS XML,
+# but the complete source tree is not stored in Git.
+external/
+
+
+# ============================================================
+# ROOT / ACLiC / cons build products
+# ============================================================
+AutoDict_*
+
+*.o
+*.a
 *.so
 *.d
 *.pcm
+
 *_C.so
 *_C.d
 *_C_ACLiC_dict_rdict.pcm
 
+.consign
+*/.consign
+
+
 # ============================================================
-# Misc temporary files
+# SUMS-generated submission files
 # ============================================================
-paw.metafile
+*.package
+*.package/
+*.dataset
+*.session.xml
+*.zip
+
+
+# ============================================================
+# Temporary template backups
+# ============================================================
+templates/full_embedding.before_restore_*/
+
+
+# ============================================================
+# Editor and filesystem temporary files
+# ============================================================
 *~
 *.swp
 *.swo
 .DS_Store
-
-# D0 embedding debug / generated files
-.sl73_x8664_gcc485/
-cleanup_*/
-work/
-
-# ROOT/CINT generated files
-AutoDict_*
-*_C.d
-*_C.so
-*.pcm
-*.d
-*.so
-
-# ROOT outputs and STAR runtime outputs
-*.root
-*.fzd
-fort.*
-gphysi.dat
-paw.metafile
-
-# temporary/debug files from embedding bring-up
-local_root4star_patch/
-local_root4star_53430_patch/
-local_sl16d_bin/
-sl16d2_D0decay_overlay/
-sl16d2_D0decay_overlay.tar.gz
-forensics/
-
-# accidental shell/test artifacts
-1
-Connection
-CONSTRUCT:
-git
-_idTruth
-_qaTruth
-mIdTruth
-mQaTruth
-qaTruth
-moretags
-pico
-
-# D0 embedding debug / generated files
-.sl73_x8664_gcc485/
-cleanup_*/
-work/
-
-# ROOT/CINT generated files
-AutoDict_*
-*_C.d
-*_C.so
-*.pcm
-*.d
-*.so
-
-# ROOT outputs and STAR runtime outputs
-*.root
-*.fzd
-fort.*
-gphysi.dat
-paw.metafile
-
-# temporary/debug files from embedding bring-up
-local_root4star_patch/
-local_root4star_53430_patch/
-local_sl16d_bin/
-sl16d2_D0decay_overlay/
-sl16d2_D0decay_overlay.tar.gz
-forensics/
-
-# accidental shell/test artifacts
-1
-Connection
-CONSTRUCT:
-git
-_idTruth
-_qaTruth
-mIdTruth
-mQaTruth
-qaTruth
-moretags
-pico
+.nfs*

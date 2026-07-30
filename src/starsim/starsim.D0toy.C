@@ -728,7 +728,7 @@ void Kinematics()
 // ----------------------------------------------------------------------------
 // ----------------------------------------------------------------------------
 void starsim(Int_t nevents = 1,
-             const char *pythiaInput = "Pythia/pythia8_D0_DetroitTune.root",
+             const char *pythiaInput = "Pythia/pythia8_D0_events.root",
              const char *moreTagsInput = "moretags.root",
              const char *starsimRootOutput = "D0toy.starsim.root",
              const char *fzdOutput = "D0toy.starsim.fzd")

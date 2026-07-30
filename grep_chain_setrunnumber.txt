@@ -1,1 +1,0 @@
-/star/nfs4/AFS/star/packages/pro/StRoot/StChain/StEvtHddr.h:46:  void          SetRunNumber(int run)	{mOldRunNumber=mRunNumber;mRunNumber=run;};
