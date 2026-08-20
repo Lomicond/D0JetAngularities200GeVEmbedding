@@ -153,7 +153,7 @@ echo "Rendered XML   : ${RENDERED_XML}"
 echo "============================================================"
 
 cd "${PROJECT}"
-star-submit "${RENDERED_XML}" | tee "${SUBMISSION_DIR}/star-submit.log"
+star-submit-beta "${RENDERED_XML}" | tee "${SUBMISSION_DIR}/star-submit.log"
 
 echo
 echo "Submission completed."
