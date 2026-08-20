@@ -8,15 +8,15 @@
   <input URL="filelist:@JOB_LIST@"
          nFiles="all" />
 
-  <stdout URL="file:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/out/D0StandaloneSyntheticMoreTagsDroy64V2_@SUBMISSION_TAG@_$JOBID.out" />
-  <stderr URL="file:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/err/D0StandaloneSyntheticMoreTagsDroy64V2_@SUBMISSION_TAG@_$JOBID.err" />
+  <stdout URL="file:@PROJECT@/out/D0StandaloneSyntheticMoreTagsDroy64V2_@SUBMISSION_TAG@_$JOBID.out" />
+  <stderr URL="file:@PROJECT@/err/D0StandaloneSyntheticMoreTagsDroy64V2_@SUBMISSION_TAG@_$JOBID.err" />
 
   <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
 
   <Generator>
-    <Location>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/report/</Location>
-    <ScriptLocation>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/csh/</ScriptLocation>
-    <ListLocation>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/list/</ListLocation>
+    <Location>@PROJECT@/report/</Location>
+    <ScriptLocation>@PROJECT@/csh/</ScriptLocation>
+    <ListLocation>@PROJECT@/list/</ListLocation>
   </Generator>
 
   <command>
@@ -26,9 +26,12 @@
     set EVENT_ID_BASE = @EVENT_ID_BASE@
     set SUBMISSION_TAG = "@SUBMISSION_TAG@"
 
-    # Two disjoint random streams per job.  JOBINDEX makes every seed unique.
-    @ PYTHIA_SEED = ${BASE_SEED} + 2 * ${JOBINDEX}
-    @ MORETAGS_SEED = ${BASE_SEED} + 2 * ${JOBINDEX} + 1
+    # Five disjoint random streams per job. JOBINDEX makes every seed unique.
+    @ PYTHIA_SEED = ${BASE_SEED} + 5 * ${JOBINDEX}
+    @ MORETAGS_SEED = ${BASE_SEED} + 5 * ${JOBINDEX} + 1
+    @ D0_DECAYER_SEED = ${BASE_SEED} + 5 * ${JOBINDEX} + 2
+    @ GEANT_SEED1 = ${BASE_SEED} + 5 * ${JOBINDEX} + 3
+    @ GEANT_SEED2 = ${BASE_SEED} + 5 * ${JOBINDEX} + 4
 
     # Non-overlapping event-ID blocks across all jobs in this submission.
     @ FIRST_EVT_ID = ${EVENT_ID_BASE} + ${JOBINDEX} * ${NEVENTS}
@@ -44,14 +47,25 @@
         exit 85
     endif
 
+    if ( ${D0_DECAYER_SEED} &lt;= 0 || ${D0_DECAYER_SEED} > 900000000 ) then
+        echo "ERROR: invalid D0-decayer seed: ${D0_DECAYER_SEED}"
+        exit 87
+    endif
+
+    if ( ${GEANT_SEED1} &lt;= 0 || ${GEANT_SEED1} > 900000000 || \
+         ${GEANT_SEED2} &lt;= 0 || ${GEANT_SEED2} > 900000000 ) then
+        echo "ERROR: invalid GEANT seeds: ${GEANT_SEED1}, ${GEANT_SEED2}"
+        exit 88
+    endif
+
     if ( ${FIRST_EVT_ID} &lt;= 0 || ${LAST_EVT_ID} > 2147483647 ) then
         echo "ERROR: invalid EvtId range: ${FIRST_EVT_ID}--${LAST_EVT_ID}"
         exit 86
     endif
 
     set SCRATCH = `pwd`
-    set PROJECT = /gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
-    set OLD_D0WF = /gpfs/mnt/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
+    set PROJECT = "@PROJECT@"
+    setenv D0WF "${SCRATCH}"
 
     set DROY_STAR = /gpfs01/star/pwg/droy1/STAR-Workspace/LocalSTAR/SL16d_embed_64b
     set DROY_ROOT4STAR = ${DROY_STAR}/.sl73_x8664_gcc485/BIN/root4star
@@ -83,10 +97,6 @@
         exit 83
     endif
 
-    foreach FILE (`grep -rl "${OLD_D0WF}" scripts src templates`)
-        sed -i "s|${OLD_D0WF}|${SCRATCH}|g" ${FILE}
-    end
-
     set RUNLOG = "${PROJECT}/log/D0StandaloneSyntheticMoreTagsDroy64V2_${SUBMISSION_TAG}_${NEVENTS}evts_seed${PYTHIA_SEED}_${JOBID}_${JOBINDEX}.log"
 
     echo "SUBMISSION_TAG=${SUBMISSION_TAG}" &gt;! "${RUNLOG}"
@@ -94,11 +104,15 @@
     echo "NEVENTS=${NEVENTS}" &gt;&gt; "${RUNLOG}"
     echo "PYTHIA_SEED=${PYTHIA_SEED}" &gt;&gt; "${RUNLOG}"
     echo "MORETAGS_SEED=${MORETAGS_SEED}" &gt;&gt; "${RUNLOG}"
+    echo "D0_DECAYER_SEED=${D0_DECAYER_SEED}" &gt;&gt; "${RUNLOG}"
+    echo "GEANT_SEED1=${GEANT_SEED1}" &gt;&gt; "${RUNLOG}"
+    echo "GEANT_SEED2=${GEANT_SEED2}" &gt;&gt; "${RUNLOG}"
     echo "FIRST_EVT_ID=${FIRST_EVT_ID}" &gt;&gt; "${RUNLOG}"
     echo "LAST_EVT_ID=${LAST_EVT_ID}" &gt;&gt; "${RUNLOG}"
 
     tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh \
         ${NEVENTS} 1 0 ${PYTHIA_SEED} ${MORETAGS_SEED} ${FIRST_EVT_ID} \
+        ${D0_DECAYER_SEED} ${GEANT_SEED1} ${GEANT_SEED2} \
         &gt;&gt;&amp;! "${RUNLOG}"
     set RUN_STATUS = $status
 
@@ -166,6 +180,9 @@
     echo "NEVENTS=${NEVENTS}" &gt;&gt; "${FINALMETA}"
     echo "PYTHIA_SEED=${PYTHIA_SEED}" &gt;&gt; "${FINALMETA}"
     echo "MORETAGS_SEED=${MORETAGS_SEED}" &gt;&gt; "${FINALMETA}"
+    echo "D0_DECAYER_SEED=${D0_DECAYER_SEED}" &gt;&gt; "${FINALMETA}"
+    echo "GEANT_SEED1=${GEANT_SEED1}" &gt;&gt; "${FINALMETA}"
+    echo "GEANT_SEED2=${GEANT_SEED2}" &gt;&gt; "${FINALMETA}"
     echo "FIRST_EVT_ID=${FIRST_EVT_ID}" &gt;&gt; "${FINALMETA}"
     echo "LAST_EVT_ID=${LAST_EVT_ID}" &gt;&gt; "${FINALMETA}"
     echo "MUDST=${FINALMUDST}" &gt;&gt; "${FINALMETA}"

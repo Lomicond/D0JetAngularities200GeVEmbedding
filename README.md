@@ -1,473 +1,455 @@
-# D0 Embedding Workflow with PYTHIA8 and STAR
+# Standalone D0 simulation with synthetic MoreTags
 
-This repository (`D0EmbeddingClean`) contains the workflow used to generate \(D^0\)-tagged events with a standalone PYTHIA8 installation and to propagate them through the STAR simulation/reconstruction chain.
+This repository contains a STAR-specific production workflow for generating
+standalone `D0`/`anti-D0` Monte Carlo events and propagating them through
+PYTHIA 8.303, STARSIM/GEANT3, standalone reconstruction, and PicoDst
+production.
 
-The current workflow is organized approximately as
+The supported batch workflow does **not** consume a real MuDst or DAQ file.
+Instead, every accepted PYTHIA event is paired entry by entry with a synthetic
+`MoreTags` entry. The collision vertex is sampled from Run14 Au+Au vertex
+histograms and the remaining run context is taken from a fixed metadata record.
 
-1. standalone PYTHIA8 event generation,
-2. MoreTags / real-event selection,
-3. DAQ chopping,
-4. STARSIM / GEANT3 transport,
-5. embedding mixer and reconstruction,
-6. PicoDst production and QA.
+The workflow was validated end to end with 100 jobs of 100 events (10,000
+events total). Before starting another large production, run the smoke tests
+described below, especially after changing paths, STAR libraries, or random-seed
+handling.
 
-> **Important:** the standalone generator is built and run with a custom PYTHIA **8.317** installation.  
-> STAR steps are run in the STAR software environment (currently **SL22c**) and should **not inherit the custom PYTHIA8 library paths**.
+That 10k validation predates the explicit job-specific seeds for
+`StarPythia8Decayer` and GEANT added with this cleanup. The full chain is
+validated, but the new five-stream seed plumbing must pass a small `5 2` smoke
+test before it is used for another large production.
 
----
+## Scope and portability
 
-## Repository layout
-
-Relevant files include
-
-```text
-config/
-└── detroit.cmnd
-
-src/
-├── pythia/
-│   └── make_d0_pythia8.cc
-├── moretags/
-│   └── makeMuDstQA_Run14.C
-├── starsim/
-│   └── starsim.D0toy.C
-├── mixer/
-│   ├── bfcMixer_Hft_D0toy.C
-│   └── runMixerD0toy_ZB.C
-└── pico/
-
-scripts/
-└── run_all.sh
-
-work/
-├── test_stage1/
-└── test_run_all/
-```
-
-The exact directory content may evolve, but the standalone generator entry point is
+This is not a generic standalone package. It is intended for users with access
+to the STAR software and filesystems at BNL. In particular, stage 5 currently
+depends on the shared Droy SL16d_embed 64-bit installation:
 
 ```text
-src/pythia/make_d0_pythia8.cc
+/gpfs01/star/pwg/droy1/STAR-Workspace/LocalSTAR/SL16d_embed_64b
 ```
 
-and the Detroit tune configuration is stored in
+The repository path itself is resolved automatically from the location of the
+top-level submission script, so another user may clone the project elsewhere.
+The shared Droy path and the project-local binary runtime assets listed under
+[Requirements](#requirements) must still be available.
+
+## Production chain
+
+| Stage | Operation | Main implementation |
+|---:|---|---|
+| 1 | Generate accepted `D0` events with PYTHIA 8.303 | `templates/simulation/pythia/` |
+| 2 | Generate and validate synthetic MoreTags | `src/moretags/makeSyntheticMoreTags_v1.C` |
+| 3 | DAQ/chopper | skipped |
+| 4 | Transport through STAR with STARSIM/GEANT3 | `src/starsim/starsim.D0toy.C` |
+| 5 | Reconstruct FZD to standalone MuDst | `templates/standalone/drivers/05_standalone_reco_droy64_v1.csh` |
+| 6 | Convert MuDst to PicoDst | `templates/standalone/drivers/06_pico.csh` |
+
+The batch entrypoint is:
 
 ```text
-config/detroit.cmnd
+submit_standalone_synthetic_moretags_droy64_v2.sh
 ```
 
----
+It renders
+`JobStandaloneProduction_synthetic_moretags_droy64_v2.template.xml`, creates
+one marker input per requested process, and submits the jobs with
+`star-submit-beta`.
 
-## Physics configuration of the standalone generator
+## Physics configuration
 
-The current generator setup uses
+### PYTHIA generation
 
-- PYTHIA8,
-- \(pp\) collisions at \(\sqrt{s}=200\) GeV,
-- Detroit tune,
-- `HardQCD:all = on`,
-- \(\hat{p}_{T,\min}=3\) GeV/\(c\),
-- `421:mayDecay = off`.
+The frozen stage-1 configuration uses:
 
-The event selection requires at least one accepted \(D^0\) or \(\bar{D}^0\) candidate satisfying
+- PYTHIA 8.303 compiled from `external/pythia8_303/`;
+- `pp` collisions at `sqrt(s) = 200 GeV`;
+- the Detroit tune;
+- `HardQCD:all = on`;
+- `PhaseSpace:pTHatMin = 3 GeV/c`;
+- `421:mayDecay = off` during event generation.
 
-- \(1 < p_T^{D^0} < 25\) GeV/\(c\),
-- \(|y_{D^0}| < 1\),
-- \(|\eta_{D^0}| < 3\).
+An event is accepted when it contains at least one `D0` or `anti-D0` satisfying
 
-Stored final particles are restricted to
+- `1 < pT(D0) < 25 GeV/c`;
+- `|y(D0)| < 1`.
 
-- final-state particles,
-- \(|\eta| < 3\),
-- neutrinos excluded.
+Stored final-state particles are restricted to `|eta| < 3`, and neutrinos are
+excluded. The frozen source and command file in
+`templates/simulation/pythia/` are authoritative if this summary and the code
+ever differ.
 
-For the authoritative and up-to-date selection logic, always check
+### Synthetic MoreTags
+
+The vertex input is:
 
 ```text
-src/pythia/make_d0_pythia8.cc
+src/moretags/Run14_AuAu200GeV_vertexDistributions.root
 ```
 
-## Running the full workflow
+It must contain:
 
-To run the complete workflow:
-
-```bash
-chmod +x run_all.sh
-./run_all.sh
+```text
+event/hVtxZ
+event/hVtxR
+metadata/RunContext
 ```
 
----
+For every accepted PYTHIA event, `makeSyntheticMoreTags_v1.C`:
 
-# Building the standalone PYTHIA8 generator
+- samples `(Vx,Vy)` jointly from `event/hVtxR`;
+- samples `Vz` independently from `event/hVtxZ`;
+- assigns a unique sequential `EvtId`;
+- copies `RunId`, STAR timestamps, and magnetic field from
+  `metadata/RunContext`.
+
+The vertex histograms do not have to be normalized. ROOT's `TH1::GetRandom()`
+and `TH2::GetRandom2()` use relative bin contents internally. Histogram
+integrals must be positive.
+
+### STARSIM and D0 decay
+
+Stage 4 synchronizes PYTHIA and MoreTags strictly by entry index. It applies
+the synthetic collision vertex through `StarPrimaryMaker` and uses the Run14
+configuration:
+
+```text
+y2014x geant gstar usexgeom agml misalign newtpcalignment bigbig
+```
+
+`D0` and `anti-D0` decays are handled by `StarPythia8Decayer` with:
+
+```text
+421:onMode = 0
+421:onIfMatch = 321 -211
+```
+
+This forces the kaon-pion channel. STARSIM writes both a ROOT bookkeeping file
+and an FZD file used by stage 5.
+
+### Reconstruction and PicoDst
+
+Stage 5 uses Droy's validated 64-bit SL16d_embed tree and reconstructs the FZD
+without a heavy-ion underlying event. Stage 6 switches to SL22c and loads the
+isolated project-local `StPicoDstMaker` library before producing the PicoDst.
 
 ## Requirements
 
-The standalone generator requires
+Run from a BNL environment in which the following are available:
 
-- a C++ compiler with C++11 support,
-- ROOT with `root-config`,
-- PYTHIA8 with `pythia8-config`.
+- `bash`, `tcsh`, `g++`, ROOT, and `root4star`;
+- `star-submit-beta`;
+- the STAR SL7 container
+  `/cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif`;
+- the shared Droy tree shown above;
+- a project-local PYTHIA 8.303 source tree in `external/pythia8_303/`;
+- project-local SL16d compatibility/overlay assets included by the XML sandbox;
+- `local_SL22c_pico_lib/libStPicoDstMaker.so` for stage 6.
 
-This workflow has been developed with a custom PYTHIA **8.317** installation.
+The XML performs early checks for Droy's `root4star`,
+`libStdEdxY2Maker.so`, and the isolated SL22c PicoDstMaker library. The
+validated `libStdEdxY2Maker.so` checksum is also checked before an expensive
+job begins.
 
----
+The binary runtime directories are intentionally not stored in Git. A fresh
+clone is therefore not sufficient by itself; another user must provide or
+rebuild the required local assets.
 
-## Option A: use author's existing PYTHIA 8.317 installation
+Before submission, verify at least:
 
-The installation used during development is
+```bash
+command -v star-submit-beta
+test -x /gpfs01/star/pwg/droy1/STAR-Workspace/LocalSTAR/SL16d_embed_64b/.sl73_x8664_gcc485/BIN/root4star
+test -s local_SL22c_pico_lib/libStPicoDstMaker.so
+test -d external/pythia8_303/include/Pythia8
+```
+
+## Quick start
+
+Run the submission script from the repository root:
+
+```bash
+bash submit_standalone_synthetic_moretags_droy64_v2.sh \
+    NEVENTS_PER_JOB NJOBS
+```
+
+For example, the validated 10k layout is:
+
+```bash
+bash submit_standalone_synthetic_moretags_droy64_v2.sh 100 100
+```
+
+This requests 100 independent jobs with 100 events per job, or 10,000 events
+in total. A smaller smoke test is:
+
+```bash
+bash submit_standalone_synthetic_moretags_droy64_v2.sh 5 1
+```
+
+Both arguments must be positive integers. The submission helper limits
+`NJOBS` to 100,000 and checks the allowed seed and signed-`Int_t` event-ID
+ranges before rendering the XML.
+
+By default the project root is the directory containing the submission script.
+An explicit override is available when needed:
+
+```bash
+D0WF_PROJECT=/absolute/path/to/D0EmbeddingClean \
+    bash /absolute/path/to/D0EmbeddingClean/submit_standalone_synthetic_moretags_droy64_v2.sh 5 1
+```
+
+## Random seeds and event IDs
+
+The submitter derives a submission-specific `BASE_SEED` from the timestamp,
+process ID, requested layout, and project path. For scheduler job index `j`,
+the random streams are:
+
+| Stream | Seed |
+|---|---:|
+| PYTHIA event generation | `BASE_SEED + 5*j` |
+| synthetic MoreTags vertex sampling | `BASE_SEED + 5*j + 1` |
+| `StarPythia8Decayer` | `BASE_SEED + 5*j + 2` |
+| GEANT seed 1 | `BASE_SEED + 5*j + 3` |
+| GEANT seed 2 | `BASE_SEED + 5*j + 4` |
+
+The GEANT seeds are passed to STAR through the `RNDM` command. All five
+streams are distinct both within a job and across jobs in one submission.
+
+Each job also receives a disjoint event-ID block:
 
 ```text
-/gpfs01/star/pwg/lomicond/Ondrej/Jets/Alma9Pythia8/pythia8317-install
+FIRST_EVT_ID = EVENT_ID_BASE + j * NEVENTS_PER_JOB
+LAST_EVT_ID  = FIRST_EVT_ID + NEVENTS_PER_JOB - 1
 ```
 
-A different user should point directly to this **absolute path**, provided the filesystem is mounted and readable on the machine being used.
+The rendered XML, submission manifest, per-job log, and final metadata file all
+record the assigned seeds and event-ID range.
 
-Do **not** use a path beginning with `~` when referring to another user's installation, because `~` expands to the home directory of the user running the command.
+## Output layout
 
-For example:
-
-```bash
-export PYTHIA8=/gpfs01/star/pwg/lomicond/Ondrej/Jets/Alma9Pythia8/pythia8317-install
-
-export PATH="$PYTHIA8/bin:$PATH"
-export LD_LIBRARY_PATH="$PYTHIA8/lib:$PYTHIA8/lib64:${LD_LIBRARY_PATH:-}"
-export PYTHIA8DATA="$PYTHIA8/share/Pythia8/xmldoc"
-
-hash -r
-```
-
-### Verify the environment
-
-```bash
-which pythia8-config
-pythia8-config --version
-
-echo "$PYTHIA8"
-echo "$PYTHIA8DATA"
-```
-
-The expected PYTHIA version is
+Every submission gets a unique tag of the form:
 
 ```text
-8.317
+YYYYMMDD_HHMMSS_PID
 ```
 
-and `which pythia8-config` should resolve inside
+Submission bookkeeping is stored under:
 
 ```text
-$PYTHIA8/bin/
+submission/synthetic_moretags/<SUBMISSION_TAG>/
+├── JobStandaloneProduction_synthetic_moretags_droy64_v2.xml
+├── job_markers/
+├── job_markers.list
+├── submission_manifest.txt
+└── star-submit.log
 ```
 
-A useful additional check is
-
-```bash
-test -d "$PYTHIA8DATA" && echo "PYTHIA8DATA OK"
-```
-
----
-
-## Option B: use another local PYTHIA8 installation
-
-Point the same variables to the installation prefix:
-
-```bash
-export PYTHIA8=/path/to/your/pythia8-install
-
-export PATH="$PYTHIA8/bin:$PATH"
-export LD_LIBRARY_PATH="$PYTHIA8/lib:$PYTHIA8/lib64:${LD_LIBRARY_PATH:-}"
-export PYTHIA8DATA="$PYTHIA8/share/Pythia8/xmldoc"
-
-hash -r
-```
-
-Then verify
-
-```bash
-which pythia8-config
-pythia8-config --version
-```
-
-The workflow is validated with PYTHIA 8.317. Other versions may require separate validation.
-
----
-
-## Compile
-
-Run from the repository root:
-
-```bash
-mkdir -p build/bin
-
-g++ -std=c++11 -O2 \
-    src/pythia/make_d0_pythia8.cc \
-    -o build/bin/make_d0_pythia8_8317 \
-    $(pythia8-config --cxxflags --libs) \
-    $(root-config --cflags --libs)
-```
-
-Equivalent compact command:
-
-```bash
-g++ -std=c++11 -O2 src/pythia/make_d0_pythia8.cc \
-    -o build/bin/make_d0_pythia8_8317 \
-    `pythia8-config --cxxflags --libs` \
-    `root-config --cflags --libs`
-```
-
-### Check which PYTHIA library was linked
-
-```bash
-ldd build/bin/make_d0_pythia8_8317 | grep -i pythia
-```
-
-This is especially useful on systems where another PYTHIA installation is already available globally.
-
-The resolved library should correspond to the intended 8.317 installation.
-
----
-
-## Run
-
-Run the executable from the repository root so that repository-relative configuration paths such as
+Scheduler output and consolidated job logs are written to:
 
 ```text
-config/detroit.cmnd
+out/
+err/
+log/
+report/
+csh/
+list/
 ```
 
-remain resolvable:
-
-```bash
-./build/bin/make_d0_pythia8_8317
-```
-
-The current source code is the authoritative reference for the number of generated events, command-line handling, output naming, stored branches, and event-selection details.
-
----
-
-# Recommended clean environment handling
-
-The safest approach is to use the custom PYTHIA environment only for the standalone generation stage.
-
-For example, start a dedicated shell:
-
-```bash
-bash
-```
-
-Inside that shell:
-
-```bash
-export PYTHIA8=/gpfs01/star/pwg/lomicond/Ondrej/Jets/Alma9Pythia8/pythia8317-install
-export PATH="$PYTHIA8/bin:$PATH"
-export LD_LIBRARY_PATH="$PYTHIA8/lib:$PYTHIA8/lib64:${LD_LIBRARY_PATH:-}"
-export PYTHIA8DATA="$PYTHIA8/share/Pythia8/xmldoc"
-
-hash -r
-
-mkdir -p build/bin
-
-g++ -std=c++11 -O2 \
-    src/pythia/make_d0_pythia8.cc \
-    -o build/bin/make_d0_pythia8_8317 \
-    $(pythia8-config --cxxflags --libs) \
-    $(root-config --cflags --libs)
-
-./build/bin/make_d0_pythia8_8317
-```
-
-After generation, leave that shell:
-
-```bash
-exit
-```
-
-Then start the STAR workflow from a clean shell and load the required STAR environment, e.g. SL22c.
-
-This avoids accidental mixing of
-
-- the custom standalone PYTHIA 8.317 libraries, and
-- the libraries expected by the STAR software stack.
-
----
-
-# STAR simulation / embedding stages
-
-After standalone event generation, the workflow continues through the STAR chain.
-
-Relevant source files include
+Successful final products are copied from the scheduler scratch directory to:
 
 ```text
-src/moretags/makeMuDstQA_Run14.C
-src/starsim/starsim.D0toy.C
-src/mixer/bfcMixer_Hft_D0toy.C
-src/mixer/runMixerD0toy_ZB.C
+production/synthetic_moretags/
 ```
 
-The high-level sequence is
+For each job this directory contains:
 
 ```text
-PYTHIA8 generation
-        ↓
-MoreTags / event selection
-        ↓
-DAQ chopping
-        ↓
-STARSIM / GEANT3
-        ↓
-Mixer / reconstruction
-        ↓
-PicoDst production and QA
+D0StandaloneSyntheticMoreTagsDroy64V2_<TAG>_<N>evts_seed<SEED>_<JOBID>_<JOBINDEX>.MuDst.root
+D0StandaloneSyntheticMoreTagsDroy64V2_<TAG>_<N>evts_seed<SEED>_<JOBID>_<JOBINDEX>.picoDst.root
+D0StandaloneSyntheticMoreTagsDroy64V2_<TAG>_<N>evts_seed<SEED>_<JOBID>_<JOBINDEX>.metadata.txt
 ```
 
-The STAR stages should be executed in the corresponding STAR environment rather than in the custom standalone-PYTHIA shell.
+If reconstruction succeeds but the PicoDst stage fails, the MuDst is copied to
+`production/synthetic_moretags/checkpoints/` before the job exits.
 
-Current development uses
+## Monitoring and completeness checks
+
+The submission helper prints the tag and writes it to
+`submission_manifest.txt`. For a known tag:
+
+```bash
+TAG=YYYYMMDD_HHMMSS_PID
+
+find production/synthetic_moretags \
+    -maxdepth 1 -name "*${TAG}*.picoDst.root" | wc -l
+
+find production/synthetic_moretags \
+    -maxdepth 1 -name "*${TAG}*.metadata.txt" | wc -l
+
+ls -lh log/*"${TAG}"*
+```
+
+The expected PicoDst and metadata counts are both `NJOBS`. Inspect failures in
+the corresponding consolidated log under `log/`, then in `out/` and `err/`.
+
+## Manual execution and stage restart
+
+Batch submission is recommended for production. The underlying runner can also
+be called directly for testing:
+
+```tcsh
+tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh \
+    NEVENTS START_STAGE FORCE \
+    PYTHIA_SEED MORETAGS_SEED FIRST_EVT_ID \
+    D0_DECAYER_SEED GEANT_SEED1 GEANT_SEED2
+```
+
+Example:
+
+```tcsh
+tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh \
+    5 1 0 1000011 2000011 1000011 3000011 4000011 5000011
+```
+
+`START_STAGE` may be `1`, `2`, `4`, `5`, or `6`. Stage 3 does not exist in
+this standalone workflow. With `FORCE=0`, a stage is skipped when its existing
+output passes validation. With `FORCE=1`, stages from `START_STAGE` onward are
+rerun.
+
+Use exactly the same event count, seeds, and first event ID when resuming an
+existing job; these values are part of its working-directory name and random
+state definition.
+
+## Merging PicoDst files
+
+Merge only files belonging to one submission tag:
+
+```bash
+TAG=YYYYMMDD_HHMMSS_PID
+
+hadd -f "Output_${TAG}_MC.root" \
+    production/synthetic_moretags/*"${TAG}"*.picoDst.root
+```
+
+Before merging, verify that the number of input PicoDst files equals the
+requested number of jobs and inspect the metadata files for unique seeds and
+non-overlapping event-ID ranges.
+
+## Fast MC QA
+
+`scripts/qa/comparePicoDstSamples_v17.C` is a lightweight MC-only comparison.
+It reads only:
 
 ```text
-SL22c
+McTrack.mPx
+McTrack.mPy
+McTrack.mGePid (or McTrack.mGeantId)
 ```
 
-for the STAR-side workflow.
+It produces four new/reference comparisons:
 
----
+1. MC tracks per event;
+2. MC `pT` shape;
+3. MC GEANT-PID fractions;
+4. `D0`/`anti-D0` `pT` shape for GEANT IDs 37 and 38.
 
-# Troubleshooting
-
-## `pythia8-config` points to the wrong installation
-
-Check
+Example:
 
 ```bash
-which pythia8-config
-pythia8-config --version
+mkdir -p work/qa
+
+root4star -l -b -q \
+  'scripts/qa/comparePicoDstSamples_v17.C("Output_10k_MC.root","reference.picoDst.root","work/qa/PicoDstQA")'
 ```
 
-Then prepend the intended installation explicitly:
+The MC-track multiplicity histogram is divided by the number of events. The
+three shape histograms are normalized to unit sum, including underflow and
+overflow. They are not divided by bin width.
 
-```bash
-export PYTHIA8=/absolute/path/to/pythia8317-install
-export PATH="$PYTHIA8/bin:$PATH"
-hash -r
-```
-
-Check again:
-
-```bash
-which pythia8-config
-pythia8-config --version
-```
-
----
-
-## Runtime error: PYTHIA shared library not found
-
-Make sure the library directory is visible:
-
-```bash
-export LD_LIBRARY_PATH="$PYTHIA8/lib:$PYTHIA8/lib64:${LD_LIBRARY_PATH:-}"
-```
-
-Then inspect the executable:
-
-```bash
-ldd build/bin/make_d0_pythia8_8317 | grep -i pythia
-```
-
----
-
-## XML data directory not found
-
-Set
-
-```bash
-export PYTHIA8DATA="$PYTHIA8/share/Pythia8/xmldoc"
-```
-
-and verify
-
-```bash
-ls "$PYTHIA8DATA"
-```
-
----
-
-## Generator works, but STAR macros behave strangely
-
-Check that the STAR shell is not inheriting the custom standalone PYTHIA setup:
-
-```bash
-echo "$PYTHIA8"
-echo "$PYTHIA8DATA"
-which pythia8-config
-echo "$LD_LIBRARY_PATH"
-```
-
-The recommended fix is to run the STAR stage from a new clean shell rather than manually trying to undo every modified environment variable.
-
----
-
-## Wrong tune/configuration file path
-
-Run the generator from the repository root and verify
-
-```bash
-ls config/detroit.cmnd
-```
-
----
-
-# Reproducibility notes
-
-For reproducible production, record at least
-
-- git commit hash,
-- PYTHIA version,
-- ROOT version,
-- STAR library version,
-- generator configuration,
-- number of requested and accepted events,
-- random seed,
-- input real-data file list used for embedding.
-
-Useful commands:
-
-```bash
-git rev-parse HEAD
-pythia8-config --version
-root-config --version
-```
-
-For STAR productions, also record the active STAR environment, for example SL22c.
-
----
-
-# Status
-
-This is an analysis/development workflow. Physics selections and production details may still evolve.
-
-Before large-scale production, validate
-
-- generator-level \(D^0\) spectra,
-- accepted-event fraction,
-- particle content,
-- STARSIM transport,
-- detector acceptance maps,
-- reconstructed distributions,
-- consistency of the full chain with the reference STAR production.
-
-
-## Local runtime dependencies
-
-The following runtime components are intentionally not stored in Git:
-
-- `external/pythia8_303/`
-- `.sl73_x8664_gcc485/`
-- `local_SL16d_embed2_facade/`
-- `local_sl16d_bin/`
--- `.sl73_x8664_gcc485/`
-- `local_SL16d `sl16d2_D0decay_overlay/`
-
-The standalone workflow was validated with:
+The outputs are:
 
 ```text
-scripts/run_standalone_production_v3.csh
+work/qa/PicoDstQA_mc_summary_v17.pdf
+work/qa/PicoDstQA_mc_summary_v17.root
+```
+
+## Repository map
+
+```text
+submit_standalone_synthetic_moretags_droy64_v2.sh
+JobStandaloneProduction_synthetic_moretags_droy64_v2.template.xml
+
+scripts/
+├── run_standalone_production_synthetic_moretags_droy64_v2.csh
+├── setup_Droy_SL16d_embed_64b_v1.csh
+└── qa/
+    └── comparePicoDstSamples_v17.C
+
+src/
+├── moretags/
+│   ├── makeSyntheticMoreTags_v1.C
+│   └── Run14_AuAu200GeV_vertexDistributions.root
+├── starsim/
+│   └── starsim.D0toy.C
+├── standalone/
+└── pico/
+
+templates/
+├── simulation/
+└── standalone/
+    └── drivers/
+        ├── 05_standalone_reco_droy64_v1.csh
+        └── 06_pico.csh
+```
+
+## Cleaning generated output
+
+`CleanOutput.csh` removes scheduler logs, reports, and everything currently
+stored under `production/`. It asks for confirmation, but the operation is
+destructive and the ROOT products are not recoverable from Git.
+
+Run it only from the repository root and only after copying all required
+production outputs elsewhere:
+
+```tcsh
+./CleanOutput.csh
+```
+
+The ignored `submission/` bookkeeping directories are intentionally not
+removed by this helper.
+
+## Reproducibility checklist
+
+For every production, preserve:
+
+- the Git commit hash (`git rev-parse HEAD`);
+- `submission_manifest.txt` and the rendered XML;
+- all per-job `.metadata.txt` files;
+- the STAR, ROOT, and Droy environment snapshots stored by stage 5;
+- the vertex-distribution ROOT file and its checksum;
+- the final MuDst/PicoDst file list;
+- the QA report.
+
+Do not mix files from different submission tags merely because they have the
+same number of events per job.
+
+## Known limitations
+
+- The current production depends on BNL/STAR infrastructure and Droy's shared
+  SL16d_embed tree.
+- Synthetic MoreTags reproduce the supplied vertex distributions and fixed run
+  context; they do not reproduce all correlations of real Run14 events.
+- `Vz` is sampled independently of `(Vx,Vy)` by construction.
+- There is no real DAQ input and no heavy-ion underlying event in standalone
+  reconstruction.
+- Stage 1 compiles the frozen PYTHIA 8.303 source inside each job.
+- Internal working filenames retain the historical
+  `st_physics_15130045_raw_1000011` stem. Final filenames and metadata contain
+  unique submission, seed, job, and event-ID information.
+
+## Citation and contact
+
+When using this workflow in an analysis, cite the relevant STAR software and
+simulation documentation and record the exact repository commit. Project-level
+physics choices should be confirmed with the analysis owner before production.

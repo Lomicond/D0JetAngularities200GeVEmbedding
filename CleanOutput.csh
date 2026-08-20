@@ -17,7 +17,7 @@ if ( "$yn" == "y" ) then
     rm -f ./log/*
     rm -f ./out/*
     rm -f ./report/*
-    rm -f ./production/*
+    rm -rf ./production/*
 
     rm -f sched*.dataset
     rm -f sched*.session.xml

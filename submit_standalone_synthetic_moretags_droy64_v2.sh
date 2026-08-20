@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-PROJECT="/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+PROJECT="${D0WF_PROJECT:-${SCRIPT_DIR}}"
 TEMPLATE="${PROJECT}/JobStandaloneProduction_synthetic_moretags_droy64_v2.template.xml"
 RUNTIME="${PROJECT}/scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh"
 MORETAGS_MACRO="${PROJECT}/src/moretags/makeSyntheticMoreTags_v1.C"
@@ -49,8 +50,8 @@ do
     fi
 done
 
-if ! command -v star-submit >/dev/null 2>&1; then
-    echo "ERROR: star-submit is unavailable in the current environment" >&2
+if ! command -v star-submit-beta >/dev/null 2>&1; then
+    echo "ERROR: star-submit-beta is unavailable in the current environment" >&2
     exit 6
 fi
 
@@ -58,10 +59,11 @@ RUN_TAG="$(date +%Y%m%d_%H%M%S)_$$"
 ENTROPY_TEXT="${RUN_TAG}:$(date +%s%N):${NEVENTS}:${NJOBS}:${PROJECT}"
 ENTROPY="$(printf '%s\n' "${ENTROPY_TEXT}" | cksum | awk '{print $1}')"
 
-# Pythia accepts seeds up to 900000000.  The even/odd assignment in the XML
-# gives two distinct seeds per scheduler job.
+# PYTHIA accepts seeds up to 900000000.  Each scheduler job receives five
+# disjoint random streams: generator, MoreTags, D0 decayer, and two GEANT
+# seeds used by the STAR RNDM command.
 BASE_SEED=$((1000000 + ENTROPY % 700000000))
-MAX_SEED=$((BASE_SEED + 2 * NJOBS + 1))
+MAX_SEED=$((BASE_SEED + 5 * NJOBS + 4))
 
 if (( MAX_SEED > 900000000 )); then
     echo "ERROR: generated seed range exceeds the PYTHIA limit" >&2
@@ -110,6 +112,7 @@ sed \
     -e "s|@NJOBS@|${NJOBS}|g" \
     -e "s|@BASE_SEED@|${BASE_SEED}|g" \
     -e "s|@EVENT_ID_BASE@|${EVENT_ID_BASE}|g" \
+    -e "s|@PROJECT@|${PROJECT}|g" \
     -e "s|@JOB_LIST@|${JOB_LIST}|g" \
     -e "s|@SUBMISSION_TAG@|${RUN_TAG}|g" \
     "${TEMPLATE}" > "${RENDERED_XML}"
@@ -128,12 +131,16 @@ TOTAL_EVENTS=$((NEVENTS * NJOBS))
 
 {
     echo "submission_tag=${RUN_TAG}"
+    echo "project=${PROJECT}"
     echo "events_per_job=${NEVENTS}"
     echo "number_of_jobs=${NJOBS}"
     echo "total_requested_events=${TOTAL_EVENTS}"
     echo "base_seed=${BASE_SEED}"
-    echo 'pythia_seed_formula=BASE_SEED+2*JOBINDEX'
-    echo 'moretags_seed_formula=BASE_SEED+2*JOBINDEX+1'
+    echo 'pythia_seed_formula=BASE_SEED+5*JOBINDEX'
+    echo 'moretags_seed_formula=BASE_SEED+5*JOBINDEX+1'
+    echo 'd0_decayer_seed_formula=BASE_SEED+5*JOBINDEX+2'
+    echo 'geant_seed1_formula=BASE_SEED+5*JOBINDEX+3'
+    echo 'geant_seed2_formula=BASE_SEED+5*JOBINDEX+4'
     echo "event_id_base=${EVENT_ID_BASE}"
     echo 'first_evt_id_formula=EVENT_ID_BASE+JOBINDEX*NEVENTS'
     echo "job_list=${JOB_LIST}"

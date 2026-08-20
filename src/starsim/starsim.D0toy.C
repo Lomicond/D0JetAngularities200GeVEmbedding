@@ -18,6 +18,7 @@
 
 #include <vector>
 #include <iostream>
+#include <cstdlib>
 
 
 //#include "StarGenerator/Pythia8_3_03/StarPythia8Decayer.h"
@@ -77,6 +78,9 @@ Double_t gTagMagField  = 0.0;
 Long64_t gMoreTagsEntries = 0;
 Double_t gGeometryMagField = 0.0;
 Int_t    gFirstRunId       = 0;
+Int_t    gD0DecaySeed      = 3000011;
+Int_t    gGeantSeed1       = 4000011;
+Int_t    gGeantSeed2       = 5000011;
 
 const Bool_t printFirstEvent = kFALSE;
 void PrintG2TRawRows()
@@ -546,12 +550,14 @@ void SetupD0Decay()
     decayMgr->AddDecayer(0, decayPy8);
     decayPy8->SetDebug(0);
     decayPy8->Set("Print:quiet = on");
+    decayPy8->Set("Random:setSeed = on");
+    decayPy8->Set(Form("Random:seed = %d", gD0DecaySeed));
 
     // First try exactly the channel used in the STAR HFjets macro.
     decayPy8->Set("421:onMode = 0");
     decayPy8->Set("421:onIfMatch = 321 -211");
 
-    cout << "D0 decay configured" << endl;
+    cout << "D0 decay configured with seed " << gD0DecaySeed << endl;
 }
 // ----------------------------------------------------------------------------
 
@@ -777,6 +783,21 @@ void starsim(Int_t nevents = 1,
         return;
     }
 
+    const char *decaySeedText = gSystem->Getenv("D0WF_D0_DECAYER_SEED");
+    const char *geantSeed1Text = gSystem->Getenv("D0WF_GEANT_SEED1");
+    const char *geantSeed2Text = gSystem->Getenv("D0WF_GEANT_SEED2");
+
+    if (decaySeedText) gD0DecaySeed = atoi(decaySeedText);
+    if (geantSeed1Text) gGeantSeed1 = atoi(geantSeed1Text);
+    if (geantSeed2Text) gGeantSeed2 = atoi(geantSeed2Text);
+
+    if (gD0DecaySeed <= 0 || gD0DecaySeed > 900000000 ||
+        gGeantSeed1 <= 0 || gGeantSeed1 > 900000000 ||
+        gGeantSeed2 <= 0 || gGeantSeed2 > 900000000) {
+        cout << "ERROR: invalid D0-decayer/GEANT production seeds." << endl;
+        return;
+    }
+
     // ------------------------------------------------------------------------
     // Open MoreTags first. The first selected real-data event defines the
     // initial STAR DB timestamps and the magnetic field, following the Run14
@@ -873,8 +894,9 @@ void starsim(Int_t nevents = 1,
                          geometryTag.Data());
     geometry(geometryCommand);
 
-    // Keep the Stage 2A random-number treatment unchanged for now.
-    // A production seed policy will be handled separately.
+    cout << "  D0-decayer seed = " << gD0DecaySeed << endl
+         << "  GEANT seeds     = " << gGeantSeed1
+         << ", " << gGeantSeed2 << endl;
 
     _primary = new StarPrimaryMaker();
     _primary->SetFileName(starsimRootOutput);
@@ -956,6 +978,7 @@ void starsim(Int_t nevents = 1,
     gPythiaEntry = 0;
 
     command("gkine -4 0");
+    command(Form("rndm %d %d", gGeantSeed1, gGeantSeed2));
 
     TString fzdCommand = "gfile o ";
     fzdCommand += fzdOutput;
@@ -981,4 +1004,3 @@ void starsim(Int_t nevents = 1,
          << endl;
 }
 // ----------------------------------------------------------------------------
-

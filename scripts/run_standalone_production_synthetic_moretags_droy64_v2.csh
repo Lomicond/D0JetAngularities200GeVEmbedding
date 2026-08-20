@@ -23,20 +23,27 @@
 #   argv[4] = PYTHIA seed, default 1000011
 #   argv[5] = synthetic-MoreTags seed, default 2000011
 #   argv[6] = first synthetic event ID, default 1000011
+#   argv[7] = D0-decayer seed, default 3000011
+#   argv[8] = first GEANT seed, default 4000011
+#   argv[9] = second GEANT seed, default 5000011
 #
 # Examples:
 #
 #   Fresh 5-event run (new output directories; resume if already present):
-#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh 5 1 0 1000011 2000011 1000011
+#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh \
+#           5 1 0 1000011 2000011 1000011 3000011 4000011 5000011
 #
 #   Force a complete fresh 5-event rerun:
-#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh 5 1 1 1000011 2000011 1000011
+#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh \
+#           5 1 1 1000011 2000011 1000011 3000011 4000011 5000011
 #
 #   Resume from STARSIM:
-#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh 5 4 0 1000011 2000011 1000011
+#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh \
+#           5 4 0 1000011 2000011 1000011 3000011 4000011 5000011
 #
 #   Force only PicoDst:
-#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh 5 6 1 1000011 2000011 1000011
+#       tcsh scripts/run_standalone_production_synthetic_moretags_droy64_v2.csh \
+#           5 6 1 1000011 2000011 1000011 3000011 4000011 5000011
 #
 
 umask 002
@@ -46,8 +53,13 @@ set nonomatch
 # Basic configuration
 # ============================================================================
 
-setenv D0WF \
-"/gpfs/mnt/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean"
+if ( ! $?D0WF ) then
+    set SCRIPT_DIR = `dirname "$0"`
+    set SCRIPT_DIR = `readlink -f "$SCRIPT_DIR"`
+    setenv D0WF `dirname "$SCRIPT_DIR"`
+else
+    setenv D0WF `readlink -f "$D0WF"`
+endif
 
 set NEVENTS = 5
 set START_STAGE = 1
@@ -55,6 +67,9 @@ set FORCE = 0
 set PYTHIA_SEED = 1000011
 set MORETAGS_SEED = 2000011
 set FIRST_EVT_ID = 1000011
+set D0_DECAYER_SEED = 3000011
+set GEANT_SEED1 = 4000011
+set GEANT_SEED2 = 5000011
 
 if ( $#argv >= 1 ) then
     set NEVENTS = "$argv[1]"
@@ -78,6 +93,18 @@ endif
 
 if ( $#argv >= 6 ) then
     set FIRST_EVT_ID = "$argv[6]"
+endif
+
+if ( $#argv >= 7 ) then
+    set D0_DECAYER_SEED = "$argv[7]"
+endif
+
+if ( $#argv >= 8 ) then
+    set GEANT_SEED1 = "$argv[8]"
+endif
+
+if ( $#argv >= 9 ) then
+    set GEANT_SEED2 = "$argv[9]"
 endif
 
 if ( $NEVENTS <= 0 ) then
@@ -120,6 +147,31 @@ endif
 if ( $FIRST_EVT_ID <= 0 ) then
     echo "ERROR: FIRST_EVT_ID must be positive"
     exit 7
+endif
+
+if ( $D0_DECAYER_SEED <= 0 || $D0_DECAYER_SEED > 900000000 ) then
+    echo "ERROR: D0_DECAYER_SEED must be in 1--900000000"
+    exit 8
+endif
+
+if ( $GEANT_SEED1 <= 0 || $GEANT_SEED1 > 900000000 || \
+     $GEANT_SEED2 <= 0 || $GEANT_SEED2 > 900000000 ) then
+    echo "ERROR: both GEANT seeds must be in 1--900000000"
+    exit 8
+endif
+
+if ( $PYTHIA_SEED == $MORETAGS_SEED || \
+     $PYTHIA_SEED == $D0_DECAYER_SEED || \
+     $PYTHIA_SEED == $GEANT_SEED1 || \
+     $PYTHIA_SEED == $GEANT_SEED2 || \
+     $MORETAGS_SEED == $D0_DECAYER_SEED || \
+     $MORETAGS_SEED == $GEANT_SEED1 || \
+     $MORETAGS_SEED == $GEANT_SEED2 || \
+     $D0_DECAYER_SEED == $GEANT_SEED1 || \
+     $D0_DECAYER_SEED == $GEANT_SEED2 || \
+     $GEANT_SEED1 == $GEANT_SEED2 ) then
+    echo "ERROR: all production seeds must differ"
+    exit 8
 endif
 
 if ( ! -d "$D0WF" ) then
@@ -407,6 +459,8 @@ echo "============================================================"
 echo "Events          : $NEVENTS"
 echo "PYTHIA seed     : $PYTHIA_SEED"
 echo "MoreTags seed   : $MORETAGS_SEED"
+echo "D0-decayer seed : $D0_DECAYER_SEED"
+echo "GEANT seeds     : $GEANT_SEED1, $GEANT_SEED2"
 echo "First event ID  : $FIRST_EVT_ID"
 echo "Start stage     : $START_STAGE"
 echo "Force rerun     : $FORCE"
@@ -726,6 +780,10 @@ echo
 # Stage 4: STARSIM / GEANT3
 # ============================================================================
 
+setenv D0WF_D0_DECAYER_SEED "$D0_DECAYER_SEED"
+setenv D0WF_GEANT_SEED1 "$GEANT_SEED1"
+setenv D0WF_GEANT_SEED2 "$GEANT_SEED2"
+
 if ( $START_STAGE <= 4 ) then
 
     echo "============================================================"
@@ -943,6 +1001,8 @@ echo
 echo "Seeds and event IDs:"
 echo "    PYTHIA seed   = $PYTHIA_SEED"
 echo "    MoreTags seed = $MORETAGS_SEED"
+echo "    D0-decayer seed = $D0_DECAYER_SEED"
+echo "    GEANT seeds     = $GEANT_SEED1, $GEANT_SEED2"
 echo "    first EvtId   = $FIRST_EVT_ID"
 echo
 echo "PYTHIA:"
