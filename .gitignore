@@ -107,3 +107,10 @@ templates/full_embedding.before_restore_*/
 *.swo
 .DS_Store
 .nfs*
+
+# Generated batch and temporary files
+/lists/
+/submission/
+/root4star
+/temp_gccflags.c
+/!

@@ -10,7 +10,7 @@ set NEVENTS = @NEVENTS@
 
 set RUNBFC_SRC = "$D0WF/src/standalone/runBfc.C"
 set LOCAL_SETUP = \
-"$D0WF/scripts/setup_SL16d2_D0Embedding_hybrid_v2.csh"
+"$D0WF/scripts/setup_Droy_SL16d_embed_64b_v1.csh"
 
 set MIXDIR = "$WORK/mixer"
 set LOGDIR = "$WORK/logs"
@@ -36,15 +36,18 @@ if (! -f "$LOCAL_SETUP") then
     exit 3
 endif
 
-if (! -d "$D0WF/local_SL16d_embed2_facade") then
-    echo "ERROR: local SL16d facade is missing:"
-    echo "       $D0WF/local_SL16d_embed2_facade"
+set DROY_STAR = \
+"/gpfs01/star/pwg/droy1/STAR-Workspace/LocalSTAR/SL16d_embed_64b"
+
+if (! -d "$DROY_STAR/.sl73_x8664_gcc485/LIB") then
+    echo "ERROR: Droy 64-bit library tree is missing:"
+    echo "       $DROY_STAR/.sl73_x8664_gcc485/LIB"
     exit 4
 endif
 
-if (! -x "$D0WF/local_sl16d_bin/root4star") then
-    echo "ERROR: local root4star wrapper is missing or not executable:"
-    echo "       $D0WF/local_sl16d_bin/root4star"
+if (! -x "$DROY_STAR/.sl73_x8664_gcc485/BIN/root4star") then
+    echo "ERROR: Droy root4star is missing or not executable:"
+    echo "       $DROY_STAR/.sl73_x8664_gcc485/BIN/root4star"
     exit 5
 endif
 
@@ -76,7 +79,7 @@ if (! -e "$FZD") then
 endif
 
 echo "======================================================"
-echo "Standalone reconstruction v2"
+echo "Standalone reconstruction Droy64 v1"
 echo "Date       = `date`"
 echo "Host       = `hostname`"
 echo "FZD        = $FZD"
@@ -141,7 +144,7 @@ endif
 ############################################################
 
 set SNAPSHOT = \
-"$SNAPDIR/05_standalone_environment_v2.txt"
+"$SNAPDIR/05_standalone_environment_droy64_v1.txt"
 
 echo "Date: `date`" >! "$SNAPSHOT"
 echo "Host: `hostname`" >> "$SNAPSHOT"
@@ -162,16 +165,47 @@ echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH" >> "$SNAPSHOT"
 md5sum \
     "$RUNBFC_SRC" \
     "$FZD" \
+    "$ROOT4STAR" \
+    "$STAR_LIB/libStdEdxY2Maker.so" \
     >> "$SNAPSHOT"
 
-grep -Eqi \
-'droy|/gpfs01/star/pwg/droy1|/star/u/droy1' \
-"$SNAPSHOT"
+set RESOLVED_STAR = `readlink -f "$STAR"`
+set RESOLVED_EXPECTED_STAR = `readlink -f "$DROY_STAR"`
+
+if ("$RESOLVED_STAR" != "$RESOLVED_EXPECTED_STAR") then
+    echo "ERROR: wrong STAR tree is active"
+    echo "       active   = $RESOLVED_STAR"
+    echo "       expected = $RESOLVED_EXPECTED_STAR"
+    exit 20
+endif
+
+set RESOLVED_ROOT4STAR = `readlink -f "$ROOT4STAR"`
+set EXPECTED_ROOT4STAR = \
+`readlink -f "$DROY_STAR/.sl73_x8664_gcc485/BIN/root4star"`
+
+if ("$RESOLVED_ROOT4STAR" != "$EXPECTED_ROOT4STAR") then
+    echo "ERROR: wrong root4star is active"
+    echo "       active   = $RESOLVED_ROOT4STAR"
+    echo "       expected = $EXPECTED_ROOT4STAR"
+    exit 21
+endif
+
+echo "$LD_LIBRARY_PATH" | tr ':' '\n' | \
+    grep -E 'SL16d_embed2|local_SL16d_embed2_facade|local_sl16d_bin'
 
 if ($status == 0) then
-    echo "ERROR: external personal-directory dependency detected"
+    echo "ERROR: SL16d_embed2 contamination detected"
     echo "       See $SNAPSHOT"
-    exit 20
+    exit 22
+endif
+
+set DEDX_MD5 = \
+`md5sum "$STAR_LIB/libStdEdxY2Maker.so" | awk '{print $1}'`
+
+if ("$DEDX_MD5" != "eaed165ff1ed2b5e556b08d82f5fe139") then
+    echo "ERROR: unexpected Droy libStdEdxY2Maker.so"
+    echo "       MD5 = $DEDX_MD5"
+    exit 23
 endif
 
 echo ""
@@ -181,6 +215,17 @@ echo "STAR_LEVEL = $STAR_LEVEL"
 echo "ROOT_LEVEL = $ROOT_LEVEL"
 echo "ROOTSYS    = $ROOTSYS"
 echo "root4star  = $ROOT4STAR"
+echo "STAR_LIB: $STAR_LIB" >> "$SNAPSHOT"
+echo "STAR_BIN: $STAR_BIN" >> "$SNAPSHOT"
+echo "D0WF_DROY_STAR: $D0WF_DROY_STAR" >> "$SNAPSHOT"
+echo "D0WF_DROY_BUILD: $D0WF_DROY_BUILD" >> "$SNAPSHOT"
+echo "D0WF_DROY_ROOT4STAR: $D0WF_DROY_ROOT4STAR" >> "$SNAPSHOT"
+
+echo "Resolved root4star: `readlink -f "$ROOT4STAR"`" \
+    >> "$SNAPSHOT"
+
+echo "Resolved libStdEdxY2Maker: `readlink -f "$STAR_LIB/libStdEdxY2Maker.so"`" \
+    >> "$SNAPSHOT"
 echo ""
 
 ############################################################
@@ -189,7 +234,7 @@ echo ""
 
 root4star -l -b -q \
     'runBfc.C('"$NEVENTS"',"'st_physics_15130045_raw_1000011.fzd'")' \
-    >&! "$LOGDIR/05_standalone_reco_v2.root4star.log"
+    >&! "$LOGDIR/05_standalone_reco_droy64_v1.root4star.log"
 
 set ROOT_STATUS = $status
 
@@ -232,7 +277,7 @@ echo "Produced standalone MuDst:"
 ls -lh "$EXPECTED"
 
 echo ""
-echo "Standalone Stage 5 v2 completed successfully."
+echo "Standalone Stage 5 Droy64 v1 completed successfully."
 echo "End: `date`"
 
 exit 0

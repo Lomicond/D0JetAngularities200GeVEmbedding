@@ -1,0 +1,145 @@
+<job name="D0StandaloneProduction"
+     minFilesPerProcess="1"
+     maxFilesPerProcess="1"
+     fileListSyntax="xrootd"
+     simulateSubmission="false">
+
+  <!-- Test submission: process one MuDst file in one job. -->
+  <input URL="filelist:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/templates/simulation/mudst.selected.list"
+         nFiles="1" />
+
+  <stdout URL="file:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/out/$JOBID.out" />
+  <stderr URL="file:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/err/$JOBID.err" />
+
+  <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
+
+  <Generator>
+    <Location>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/report/</Location>
+    <ScriptLocation>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/csh/</ScriptLocation>
+    <ListLocation>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/list/</ListLocation>
+  </Generator>
+
+  <command>
+    set NEVENTS = 1000
+    set CAMPAIGN = D0JetStandalone_Detroit_v1
+    set SEED_BASE = 1000011
+
+    @ PYTHIA_SEED = ${SEED_BASE} + ${JOBINDEX}
+    set JOB_LABEL = `printf "j%05d" ${JOBINDEX}`
+    set OUTPUT_TAG = "${CAMPAIGN}_${JOB_LABEL}_s${PYTHIA_SEED}_n${NEVENTS}"
+
+    set SCRATCH = `pwd`
+    set PROJECT = /gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
+    set OLD_D0WF = /gpfs/mnt/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
+    set BASEJOB = templates/simulation
+
+    mkdir -p "${PROJECT}/log" "${PROJECT}/production"
+
+    foreach FILE (`grep -rl "${OLD_D0WF}" scripts src templates`)
+        sed -i "s|${OLD_D0WF}|${SCRATCH}|g" ${FILE}
+    end
+
+    cp "${FILELIST}" "${BASEJOB}/mudst.selected.list"
+    if ( $status != 0 ) then
+        echo "ERROR: cannot install the job MuDst file list"
+        exit 80
+    endif
+
+    cp scripts/run_standalone_production_v3.csh run_standalone_production_batch.csh
+    if ( $status != 0 ) then
+        echo "ERROR: cannot prepare the batch production wrapper"
+        exit 81
+    endif
+
+    # Each batch process has an isolated scratch directory. The suffix only
+    # distinguishes this run from the default local-test directories.
+    sed -i 's|${NEVENTS}evts_simulation_v1|${NEVENTS}evts_simulation_batch|g' run_standalone_production_batch.csh
+    sed -i 's|${NEVENTS}evts_standalone_v1|${NEVENTS}evts_standalone_batch|g' run_standalone_production_batch.csh
+
+    set RUNLOG = "${PROJECT}/log/${OUTPUT_TAG}_${JOBID}.log"
+
+    echo "Campaign    : ${CAMPAIGN}" &gt;! "${RUNLOG}"
+    echo "Job index   : ${JOBINDEX}" &gt;&gt; "${RUNLOG}"
+    echo "PYTHIA seed : ${PYTHIA_SEED}" &gt;&gt; "${RUNLOG}"
+    echo "Events      : ${NEVENTS}" &gt;&gt; "${RUNLOG}"
+    echo "Input       :" &gt;&gt; "${RUNLOG}"
+    cat "${FILELIST}" &gt;&gt; "${RUNLOG}"
+    echo "" &gt;&gt; "${RUNLOG}"
+
+    tcsh run_standalone_production_batch.csh ${NEVENTS} 1 0 ${PYTHIA_SEED} &gt;&gt;&amp;! "${RUNLOG}"
+    set RUN_STATUS = $status
+
+    if ( ${RUN_STATUS} != 0 ) then
+        exit ${RUN_STATUS}
+    endif
+
+    # The legacy st_physics_* name is kept only inside job scratch because
+    # runBfc uses it. Require exactly one final PicoDst and publish it under
+    # a stable, descriptive production name.
+    set PICOS = ( `find work/jobs -type f -path '*/pico/*.picoDst.root' -print` )
+
+    if ( $#PICOS != 1 ) then
+        echo "ERROR: expected exactly one final PicoDst, found $#PICOS" &gt;&gt; "${RUNLOG}"
+        find work/jobs -type f -name '*.picoDst.root' -print &gt;&gt; "${RUNLOG}"
+        exit 90
+    endif
+
+    set PICO = "${PICOS[1]}"
+    set FINALPICO = "${PROJECT}/production/${OUTPUT_TAG}.picoDst.root"
+    set MANIFEST = "${PROJECT}/production/${OUTPUT_TAG}.meta.txt"
+
+    if ( ! -s "${PICO}" ) then
+        echo "ERROR: final PicoDst is missing or empty: ${PICO}" &gt;&gt; "${RUNLOG}"
+        exit 91
+    endif
+
+    cp -p "${PICO}" "${FINALPICO}"
+    set COPY_STATUS = $status
+
+    if ( ${COPY_STATUS} != 0 || ! -s "${FINALPICO}" ) then
+        echo "ERROR: failed to publish final PicoDst: ${FINALPICO}" &gt;&gt; "${RUNLOG}"
+        exit 92
+    endif
+
+    echo "campaign=${CAMPAIGN}" &gt;! "${MANIFEST}"
+    echo "job_id=${JOBID}" &gt;&gt; "${MANIFEST}"
+    echo "job_index=${JOBINDEX}" &gt;&gt; "${MANIFEST}"
+    echo "pythia_seed=${PYTHIA_SEED}" &gt;&gt; "${MANIFEST}"
+    echo "requested_events=${NEVENTS}" &gt;&gt; "${MANIFEST}"
+    echo "input_file_list=${FILELIST}" &gt;&gt; "${MANIFEST}"
+    echo "input_files:" &gt;&gt; "${MANIFEST}"
+    cat "${FILELIST}" &gt;&gt; "${MANIFEST}"
+    echo "output=${FINALPICO}" &gt;&gt; "${MANIFEST}"
+    echo "run_log=${RUNLOG}" &gt;&gt; "${MANIFEST}"
+
+    echo "Published PicoDst: ${FINALPICO}" &gt;&gt; "${RUNLOG}"
+    echo "Metadata:          ${MANIFEST}" &gt;&gt; "${RUNLOG}"
+    exit 0
+  </command>
+
+  <SandBox installer="ZIP">
+    <Package name="D0Standalone">
+      <File>file:./scripts/run_standalone_production_v3.csh</File>
+      <File>file:./scripts/checkRootTree_v1.C</File>
+      <File>file:./scripts/setup_SL16d2_D0Embedding_hybrid.csh</File>
+      <File>file:./loadMuDstLibraries_SL16d.C</File>
+
+      <File>file:./src/moretags/</File>
+      <File>file:./src/starsim/</File>
+      <File>file:./src/pico/</File>
+
+      <File>file:./external/pythia8_303/</File>
+      <File>file:./scripts/setup_SL16d2_D0Embedding_hybrid_v3.csh</File>
+      <File>file:./src/standalone/</File>
+
+      <File>file:./local_SL16d_embed2_facade/.sl73_x8664_gcc485/</File>
+      <File>file:./local_sl16d_bin/</File>
+      <File>file:./sl16d2_D0decay_overlay/</File>
+      <File>file:./local_SL22c_pico_lib/</File>
+
+      <File>file:./templates/simulation/</File>
+      <File>file:./templates/standalone/</File>
+    </Package>
+  </SandBox>
+
+</job>

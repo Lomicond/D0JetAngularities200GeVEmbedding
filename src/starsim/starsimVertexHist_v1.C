@@ -756,11 +756,11 @@ void trig(Int_t n = 1)
 // ----------------------------------------------------------------------------
 void Kinematics()
 {
-  
+
   //  gSystem->Load( "libStarGeneratorPoolPythia6_4_23.so" );
   gSystem->Load( "libKinematics.so");
   kinematics = new StarKinematics();
-    
+
   _primary->AddGenerator(kinematics);
 }
 // ----------------------------------------------------------------------------
@@ -839,7 +839,7 @@ void starsim(Int_t nevents = 1,
   gSystem->Load("St_g2t");
 
   gSystem->Exec("echo PROC_EXE_FROM_MACRO=`readlink -f /proc/$PPID/exe`");
-  
+
     gROOT->ProcessLine(".L bfc.C");
     {
         TString simple = geometryTag;
@@ -851,7 +851,7 @@ void starsim(Int_t nevents = 1,
 
         cout << "  geometry tag    = " << geometryTag.Data() << endl;
         cout << "  BFC options     = " << simple.Data() << endl;
-        
+
 	bfc(0, simple);
     }
 
@@ -981,4 +981,3 @@ void starsim(Int_t nevents = 1,
          << endl;
 }
 // ----------------------------------------------------------------------------
-

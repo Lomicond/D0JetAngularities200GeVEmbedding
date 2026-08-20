@@ -31,21 +31,25 @@ rehash
 echo "D0WF_STAR_LEVEL=$STAR_LEVEL"
 echo "D0WF_STAR=$STAR"
 
-# Prefer the locally built StPicoDstMaker and related STAR libraries.
-set local_star_lib = "@D0WF@/.$STAR_HOST_SYS/lib"
+# Load the locally built SL22c StPicoDstMaker without exposing it
+# to the SL16d_embed2 reconstruction environment.
+set local_pico_lib = "@D0WF@/local_SL22c_pico_lib"
 
-if (-d "$local_star_lib") then
-    if ($?LD_LIBRARY_PATH) then
-        setenv LD_LIBRARY_PATH "${local_star_lib}:${LD_LIBRARY_PATH}"
-    else
-        setenv LD_LIBRARY_PATH "${local_star_lib}"
-    endif
-else
-    echo "ERROR: Local STAR library directory not found: $local_star_lib"
+if ( ! -s "$local_pico_lib/libStPicoDstMaker.so" ) then
+    echo "ERROR: Isolated SL22c PicoDstMaker library not found:"
+    echo "       $local_pico_lib/libStPicoDstMaker.so"
     exit 2
 endif
 
-echo "D0WF_LOCAL_STAR_LIB=$local_star_lib"
+if ( $?LD_LIBRARY_PATH ) then
+    setenv LD_LIBRARY_PATH "${local_pico_lib}:${LD_LIBRARY_PATH}"
+else
+    setenv LD_LIBRARY_PATH "${local_pico_lib}"
+endif
+
+echo "D0WF_SL22C_PICO_LIB=$local_pico_lib"
+ls -l "$local_pico_lib/StPicoDstMaker.so" \
+      "$local_pico_lib/libStPicoDstMaker.so"
 
 set pico_dir = "@SIMJOB@/pico"
 set mixer_mudst = "@SIMJOB@/mixer/st_physics_15130045_raw_1000011.MuDst.root"

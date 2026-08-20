@@ -111,7 +111,7 @@ StPicoDstMaker *StPicoDstMaker::fgPicoDstMaker = 0;
 #endif /* __TFG__VERSION__ */
 #include "StPicoDstMaker/StPicoUtilities.h"
 
-
+/*
 
 namespace {
 
@@ -182,7 +182,7 @@ bool keepMcBTofHit(const StMuBTofHit* hit)
 }
 
 } // anonymous namespace
-
+*/
 //_________________
 StPicoDstMaker::StPicoDstMaker(char const* name) :
 StMaker(name),
@@ -1078,12 +1078,6 @@ void StPicoDstMaker::fillMcTracks() {
 //_________________
 void StPicoDstMaker::fillTracks() {
 
-    static Bool_t printedTrackMarker = kFALSE;
-  if (!printedTrackMarker) {
-    LOG_INFO << "D0TOY_LOCAL_PICO_FILTER: fillTracks ACTIVE" << endm;
-    printedTrackMarker = kTRUE;
-  }
-
 #if defined (__TFG__VERSION__)
   if ( !mMuDst->primaryVertex()) return;
 #endif 
@@ -1119,10 +1113,6 @@ void StPicoDstMaker::fillTracks() {
 
     // Check the existence and track type
     if( !gTrk ) continue;
-
-    if (!keepMcRecoTrack(gTrk)) {
-        continue;
-    }
 
     if( gTrk->type()!=global ) continue;
 
@@ -2329,12 +2319,6 @@ void StPicoDstMaker::fillBTowHits() {
 //_________________
 void StPicoDstMaker::fillBTofHits() {
 
-    static Bool_t printedBTofMarker = kFALSE;
-  if (!printedBTofMarker) {
-    LOG_INFO << "D0TOY_LOCAL_PICO_FILTER: fillBTofHits ACTIVE" << endm;
-    printedBTofMarker = kTRUE;
-  }
-
   // Loop over BTOF hits
   for (unsigned int i = 0; i < mMuDst->numberOfBTofHit(); ++i) {
     
@@ -2343,11 +2327,6 @@ void StPicoDstMaker::fillBTofHits() {
     if (!aHit) continue;
     
     if (aHit->tray() > 120) continue;
-
-    // Remove real/background TOF hits.
-    if (!keepMcBTofHit(aHit)) {
-       continue;
-    }      
 
     int cellId = (aHit->tray() - 1) * 192 + (aHit->module() - 1) * 6 + (aHit->cell() - 1);
 

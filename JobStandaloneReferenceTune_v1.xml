@@ -1,9 +1,10 @@
-<job name="D0StandaloneProduction"
+<job name="D0StandaloneReferenceTune"
      minFilesPerProcess="1"
      maxFilesPerProcess="1"
      fileListSyntax="xrootd"
      simulateSubmission="false">
 
+  <!-- One MuDst input file gives exactly one batch job. -->
   <input URL="filelist:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/templates/simulation/mudst.selected.list"
          nFiles="1" />
 
@@ -26,6 +27,7 @@
     set PROJECT = /gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
     set OLD_D0WF = /gpfs/mnt/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
     set BASEJOB = templates/simulation
+    set RUN_LABEL = ReferenceTune_v1
 
     foreach FILE (`grep -rl "${OLD_D0WF}" scripts src templates`)
         sed -i "s|${OLD_D0WF}|${SCRATCH}|g" ${FILE}
@@ -33,21 +35,36 @@
 
     cp "${FILELIST}" "${BASEJOB}/mudst.selected.list"
 
-    cp scripts/run_standalone_production_v3.csh run_standalone_production_batch.csh
-    sed -i 's|${NEVENTS}evts_simulation_v1|${NEVENTS}evts_simulation_batch|g' run_standalone_production_batch.csh
-    sed -i 's|${NEVENTS}evts_standalone_v1|${NEVENTS}evts_standalone_batch|g' run_standalone_production_batch.csh
+    # Start from the same validated production wrapper as the Detroit job.
+    # Give both generated work trees unique names and change only the tune file.
+    cp scripts/run_standalone_production_v3.csh run_standalone_production_reference_batch.csh
+    sed -i "s|evts_simulation_v1|evts_simulation_referenceTune_v1|g" run_standalone_production_reference_batch.csh
+    sed -i "s|evts_standalone_v1|evts_standalone_referenceTune_v1|g" run_standalone_production_reference_batch.csh
+    sed -i "s|pythia8_detroit_v1.cmnd|pythia8_reference_effective.cmnd|g" run_standalone_production_reference_batch.csh
 
-    set RUNLOG = "${PROJECT}/log/D0Standalone_${NEVENTS}evts_${JOBID}_${JOBINDEX}.log"
+    grep -q "pythia8_reference_effective.cmnd" run_standalone_production_reference_batch.csh
+    if ( $status != 0 ) then
+        echo "ERROR: reference tune was not selected"
+        exit 81
+    endif
 
-    tcsh run_standalone_production_batch.csh ${NEVENTS} 1 0 ${PYTHIA_SEED} &gt;&amp;! "${RUNLOG}"
+    grep -q "pythia8_detroit_v1.cmnd" run_standalone_production_reference_batch.csh
+    if ( $status == 0 ) then
+        echo "ERROR: Detroit tune is still referenced by the control wrapper"
+        exit 82
+    endif
+
+    set RUNLOG = "${PROJECT}/log/D0JetStandalone_${RUN_LABEL}_j${JOBINDEX}_s${PYTHIA_SEED}_n${NEVENTS}.log"
+
+    tcsh run_standalone_production_reference_batch.csh ${NEVENTS} 1 0 ${PYTHIA_SEED} &gt;&amp;! "${RUNLOG}"
     set RUN_STATUS = $status
 
     if ( ${RUN_STATUS} != 0 ) then
         exit ${RUN_STATUS}
     endif
 
-    set PICO = work/jobs/st_physics_15130045_raw_1000011_${NEVENTS}evts_standalone_batch/pico/st_physics_15130045_raw_1000011.picoDst.root
-    set FINALPICO = "${PROJECT}/production/D0Standalone_${NEVENTS}evts_${JOBID}_${JOBINDEX}.picoDst.root"
+    set PICO = work/jobs/st_physics_15130045_raw_1000011_${NEVENTS}evts_standalone_referenceTune_v1/pico/st_physics_15130045_raw_1000011.picoDst.root
+    set FINALPICO = "${PROJECT}/production/D0JetStandalone_${RUN_LABEL}_j${JOBINDEX}_s${PYTHIA_SEED}_n${NEVENTS}.picoDst.root"
 
     if ( ! -s "${PICO}" ) then
         echo "ERROR: final PicoDst is missing: ${PICO}" &gt;&gt; "${RUNLOG}"
@@ -55,11 +72,19 @@
     endif
 
     cp "${PICO}" "${FINALPICO}"
-    exit $status
+    set COPY_STATUS = $status
+
+    if ( ${COPY_STATUS} != 0 || ! -s "${FINALPICO}" ) then
+        echo "ERROR: failed to save final PicoDst: ${FINALPICO}" &gt;&gt; "${RUNLOG}"
+        exit 91
+    endif
+
+    echo "FINALPICO=${FINALPICO}" &gt;&gt; "${RUNLOG}"
+    exit 0
   </command>
 
   <SandBox installer="ZIP">
-    <Package name="D0Standalone">
+    <Package name="D0StandaloneReferenceTune">
       <File>file:./scripts/run_standalone_production_v3.csh</File>
       <File>file:./scripts/checkRootTree_v1.C</File>
       <File>file:./scripts/setup_SL16d2_D0Embedding_hybrid.csh</File>
@@ -76,7 +101,7 @@
       <File>file:./local_SL16d_embed2_facade/.sl73_x8664_gcc485/</File>
       <File>file:./local_sl16d_bin/</File>
       <File>file:./sl16d2_D0decay_overlay/</File>
-     <File>file:./local_SL22c_pico_lib/</File>
+      <File>file:./local_SL22c_pico_lib/</File>
 
       <File>file:./templates/simulation/</File>
       <File>file:./templates/standalone/</File>

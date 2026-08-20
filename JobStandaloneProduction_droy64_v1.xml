@@ -1,0 +1,156 @@
+<job name="D0StandaloneProductionDroy64V1"
+     minFilesPerProcess="1"
+     maxFilesPerProcess="1"
+     fileListSyntax="xrootd"
+     simulateSubmission="false">
+
+  <input URL="filelist:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/templates/simulation/mudst.selected.list"
+         nFiles="1" />
+
+  <stdout URL="file:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/out/D0StandaloneDroy64V1_$JOBID.out" />
+  <stderr URL="file:/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/err/D0StandaloneDroy64V1_$JOBID.err" />
+
+  <shell>singularity exec -e -B /direct -B /star -B /afs -B /gpfs -B /sdcc/lustre02 /cvmfs/star.sdcc.bnl.gov/containers/rhic_sl7.sif</shell>
+
+  <Generator>
+    <Location>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/report/</Location>
+    <ScriptLocation>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/csh/</ScriptLocation>
+    <ListLocation>/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean/list/</ListLocation>
+  </Generator>
+
+  <command>
+    set NEVENTS = 1000
+    @ PYTHIA_SEED = 1000011 + ${JOBINDEX}
+
+    set SCRATCH = `pwd`
+    set PROJECT = /gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
+    set OLD_D0WF = /gpfs/mnt/gpfs01/star/pwg/lomicond/Ondrej/Jets/PythiaD0JetGeant/D0EmbeddingClean
+    set BASEJOB = templates/simulation
+
+    set DROY_STAR = /gpfs01/star/pwg/droy1/STAR-Workspace/LocalSTAR/SL16d_embed_64b
+    set DROY_ROOT4STAR = ${DROY_STAR}/.sl73_x8664_gcc485/BIN/root4star
+    set DROY_DEDX = ${DROY_STAR}/.sl73_x8664_gcc485/LIB/libStdEdxY2Maker.so
+    set PICO_LIB = local_SL22c_pico_lib/libStPicoDstMaker.so
+
+    if ( ! -x "${DROY_ROOT4STAR}" ) then
+        echo "ERROR: Droy root4star is unavailable: ${DROY_ROOT4STAR}"
+        exit 80
+    endif
+
+    if ( ! -r "${DROY_DEDX}" ) then
+        echo "ERROR: Droy libStdEdxY2Maker.so is unavailable: ${DROY_DEDX}"
+        exit 81
+    endif
+
+    set DEDX_MD5 = `md5sum "${DROY_DEDX}" | awk '{print $1}'`
+
+    if ( "${DEDX_MD5}" != "eaed165ff1ed2b5e556b08d82f5fe139" ) then
+        echo "ERROR: unexpected Droy libStdEdxY2Maker.so MD5: ${DEDX_MD5}"
+        exit 82
+    endif
+
+    # Stage 6 must use the isolated SL22c PicoDstMaker build.  Check it
+    # before starting the expensive simulation and reconstruction stages.
+    if ( ! -s "${PICO_LIB}" ) then
+        echo "ERROR: isolated SL22c PicoDstMaker library is missing from the sandbox:"
+        echo "       ${SCRATCH}/${PICO_LIB}"
+        exit 83
+    endif
+
+    foreach FILE (`grep -rl "${OLD_D0WF}" scripts src templates`)
+        sed -i "s|${OLD_D0WF}|${SCRATCH}|g" ${FILE}
+    end
+
+    cp "${FILELIST}" "${BASEJOB}/mudst.selected.list"
+
+    set RUNLOG = "${PROJECT}/log/D0StandaloneDroy64V1_${NEVENTS}evts_${JOBID}_${JOBINDEX}.log"
+
+    tcsh scripts/run_standalone_production_droy64_v1.csh ${NEVENTS} 1 0 ${PYTHIA_SEED} &gt;&amp;! "${RUNLOG}"
+    set RUN_STATUS = $status
+
+    set STANDWORK = work/jobs/st_physics_15130045_raw_1000011_${NEVENTS}evts_standalone_droy64_v1
+    set MUDST = "${STANDWORK}/mixer/st_physics_15130045_raw_1000011.MuDst.root"
+    set PICO = "${STANDWORK}/pico/st_physics_15130045_raw_1000011.picoDst.root"
+
+    if ( ${RUN_STATUS} != 0 ) then
+        # Keep a successfully reconstructed MuDst even when stage 6 fails.
+        if ( -s "${MUDST}" ) then
+            set CHECKPOINT_DIR = "${PROJECT}/production/checkpoints"
+            set CHECKPOINT_MUDST = "${CHECKPOINT_DIR}/D0StandaloneDroy64V1_${NEVENTS}evts_${JOBID}_${JOBINDEX}.MuDst.root"
+
+            mkdir -p "${CHECKPOINT_DIR}"
+            cp "${MUDST}" "${CHECKPOINT_MUDST}"
+            set CHECKPOINT_STATUS = $status
+
+            if ( ${CHECKPOINT_STATUS} == 0 &amp;&amp; -s "${CHECKPOINT_MUDST}" ) then
+                echo "CHECKPOINT_MUDST=${CHECKPOINT_MUDST}" &gt;&gt; "${RUNLOG}"
+            else
+                echo "WARNING: failed to save MuDst checkpoint: ${CHECKPOINT_MUDST}" &gt;&gt; "${RUNLOG}"
+            endif
+        endif
+
+        exit ${RUN_STATUS}
+    endif
+
+    set FINALMUDST = "${PROJECT}/production/D0StandaloneDroy64V1_${NEVENTS}evts_${JOBID}_${JOBINDEX}.MuDst.root"
+    set FINALPICO = "${PROJECT}/production/D0StandaloneDroy64V1_${NEVENTS}evts_${JOBID}_${JOBINDEX}.picoDst.root"
+
+    if ( ! -s "${MUDST}" ) then
+        echo "ERROR: final MuDst is missing: ${MUDST}" &gt;&gt; "${RUNLOG}"
+        exit 89
+    endif
+
+    if ( ! -s "${PICO}" ) then
+        echo "ERROR: final PicoDst is missing: ${PICO}" &gt;&gt; "${RUNLOG}"
+        exit 90
+    endif
+
+    cp "${MUDST}" "${FINALMUDST}"
+    set COPY_MUDST_STATUS = $status
+
+    if ( ${COPY_MUDST_STATUS} != 0 ) then
+        echo "ERROR: failed to copy final MuDst to ${FINALMUDST}" &gt;&gt; "${RUNLOG}"
+        exit ${COPY_MUDST_STATUS}
+    endif
+
+    cp "${PICO}" "${FINALPICO}"
+    set COPY_PICO_STATUS = $status
+
+    if ( ${COPY_PICO_STATUS} != 0 ) then
+        echo "ERROR: failed to copy final PicoDst to ${FINALPICO}" &gt;&gt; "${RUNLOG}"
+        exit ${COPY_PICO_STATUS}
+    endif
+
+    exit 0
+  </command>
+
+  <SandBox installer="ZIP">
+    <Package name="D0StandaloneDroy64V1">
+      <File>file:./scripts/run_standalone_production_droy64_v1.csh</File>
+      <File>file:./scripts/checkRootTree_v1.C</File>
+      <File>file:./scripts/setup_SL16d2_D0Embedding_hybrid.csh</File>
+      <File>file:./scripts/setup_SL16d2_D0Embedding_hybrid_v3.csh</File>
+      <File>file:./scripts/setup_Droy_SL16d_embed_64b_v1.csh</File>
+      <File>file:./loadMuDstLibraries_SL16d.C</File>
+
+      <File>file:./src/moretags/</File>
+      <File>file:./src/starsim/</File>
+      <File>file:./src/standalone/</File>
+      <File>file:./src/pico/</File>
+
+      <File>file:./external/pythia8_303/</File>
+
+      <File>file:./local_SL16d_embed2_facade/.sl73_x8664_gcc485/</File>
+      <File>file:./local_sl16d_bin/</File>
+      <File>file:./sl16d2_D0decay_overlay/</File>
+      <File>file:./.sl73_x8664_gcc485/</File>
+
+      <!-- Isolated SL22c build required by stage 6. -->
+      <File>file:./local_SL22c_pico_lib/</File>
+
+      <File>file:./templates/simulation/</File>
+      <File>file:./templates/standalone/</File>
+    </Package>
+  </SandBox>
+
+</job>
